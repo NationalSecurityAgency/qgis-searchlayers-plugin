@@ -14,9 +14,9 @@ class LayerSearch:
         self.iface = iface
 
     def initGui(self):
-
+        # All the work is done in the LayerSearchDialog
         self.searchDialog = LayerSearchDialog(self.iface, self.iface.mainWindow())
-        
+        # Create the menu items in the Plugin menu and attach the icon to the toolbar
         icon = QIcon(":/plugins/layersearch/icon.png")
         self.searchAction = QAction(icon, "Search Layer(s)", self.iface.mainWindow())
         self.searchAction.triggered.connect(self.showSearchDialog)

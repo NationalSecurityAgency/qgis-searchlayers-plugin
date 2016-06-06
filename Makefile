@@ -1,4 +1,4 @@
-PLUGINNAME = layerserch
+PLUGINNAME = layersearch
 PY_FILES = layerSearch.py __init__.py searchDialog.py searchWorker.py
 EXTRAS = icon.png metadata.txt
 UI_FILES = layersearch.ui

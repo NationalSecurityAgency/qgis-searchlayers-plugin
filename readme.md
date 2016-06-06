@@ -1,14 +1,14 @@
 #Layer Search Plugin
 
-The Layer Search plugin features enhance textual vector layer searching in QGIS. The existing QGIS searching capabilities are limited to a particular layer and a particular column. What is different about this plugin is that it will search all layers and all fields for a particular string.
+The Layer Search plugin features enhanced textual vector layer searching in QGIS. The existing QGIS searching capabilities are limited to a particular layer and a particular column. What is different about this plugin is that it will search all layers and all fields for a particular string.
 
-Layer Search will be located in the QGIS Plugins menu under *"Plugins->Search->Search Layer(s)"* or by selecting the tool bar icon. ![Toolbar Icon](icon.png)
+Layer Search will be located in the QGIS Plugins menu under *"Plugins-&gt;Search-&gt;Search Layer(s)"* or by selecting the tool bar icon. ![Toolbar Icon](icon.png)
 
 The following dialog box is displayed when the “Search Layer(s)” is launched.
 
 ![Layer Search Dialog](doc/layersearch.jpg)
 
-Enter the search string into the **Find** field. You can search **In** *<All Layers>*, *<Selected layers>*, or on any of the vector layers in your project. Note that only vector layers will be listed. **Comparison** is the matching criteria. It can be.
+Enter the search string into the **Find** field. You can search **In** *&lt;All Layers&gt;*, *&lt;Selected layers&gt;*, or on any of the vector layers in your project. Note that only vector layers will be listed. **Comparison** is the matching criteria. It can be.
 
 * **=** - This requires an exact match including case.
 * **Contains** - This performs a case independent search in which the search finds any item where a field contains the search string.

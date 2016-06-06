@@ -4,12 +4,12 @@ import re
 from PyQt4 import uic
 from PyQt4 import QtCore, QtGui
 
-#from PyQt4.QtCore import *
 from qgis.core import *
 from qgis.gui import *
 
-
 class Worker(QtCore.QObject):
+    '''This does all the hard work. It takes all the search parameters and 
+    searches through the vector layers for a match.'''
     finished = QtCore.pyqtSignal(bool)
     error = QtCore.pyqtSignal(str)
     foundmatch = QtCore.pyqtSignal(QgsVectorLayer, object, object, unicode)
@@ -25,8 +25,11 @@ class Worker(QtCore.QObject):
         self.maxResults = maxResults
         
     def run(self):
+        '''Worker Run routine'''
         self.found = 0
         try:
+            # Check to see if we are searching within a particular column of a specified
+            # layer or whether we are searching all columns.
             if self.infield is True:
                 for layer in self.vlayers:
                     self.searchFieldInLayer(layer, self.str, self.comparisonMode, self.selectedField)

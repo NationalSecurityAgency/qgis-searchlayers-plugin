@@ -16,11 +16,12 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 class LayerSearchDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface, parent):
+        '''Initialize the LayerSearch dialog box'''
         super(LayerSearchDialog, self).__init__(parent)
         self.setupUi(self)
         self.iface = iface
         self.canvas = iface.mapCanvas()
-        # connect to items added and removed for when the dialog is open
+        # Notify us when vector items ared added and removed in QGIS
         iface.legendInterface().itemAdded.connect(self.updateLayers)
         iface.legendInterface().itemRemoved.connect(self.updateLayers)
         
@@ -40,11 +41,12 @@ class LayerSearchDialog(QtGui.QDialog, FORM_CLASS):
         self.worker = None
 
     def closeDialog(self):
+        '''Close the dialog box when the Close button is pushed'''
         self.hide()
     
     def updateLayers(self):
         '''Called when a layer has been added or deleted in QGIS.
-        It forces the this dialog windows to reload'''
+        It forces the dialog to reload.'''
         # Stop any existing search
         self.killWorker()
         if self.isVisible():
@@ -70,13 +72,19 @@ class LayerSearchDialog(QtGui.QDialog, FORM_CLASS):
         self.canvas.zoomToSelected(selectedLayer)
     
     def layerSelected(self):
+        '''The user has made a selection so we need to initialize other
+        parts of the dialog box'''
         self.initSearchIn()
         
     def showEvent(self, event):
+        '''The dialog is being shown. We need to initialize it.'''
         super(LayerSearchDialog, self).showEvent(event)
         self.populateLayerListComboBox()
         
     def populateLayerListComboBox(self):
+        '''Find all the vector layers and add them to the layer list
+        that the user can select. In addition the user can search on all
+        layers or all selected layers.'''
         layerlist = ['<All Layers>','<Selected Layers>']
         self.searchLayers = [None, None] # This is same size as layerlist
         layers = self.iface.legendInterface().layers()
@@ -111,6 +119,7 @@ class LayerSearchDialog(QtGui.QDialog, FORM_CLASS):
             self.fieldListComboBox.setEnabled(False)
     
     def runSearch(self):
+        '''Called when the user pushes the Search button'''
         selectedLayer = self.layerListComboBox.currentIndex()
         comparisonMode = self.comparisonComboBox.currentIndex()
         self.noSelection = True
@@ -168,7 +177,7 @@ class LayerSearchDialog(QtGui.QDialog, FORM_CLASS):
         thread.start()
 
     def workerFinished(self, status):
-        # clean up the worker and thread
+        '''Clean up the worker and thread'''
         self.worker.deleteLater()
         self.thread.quit()
         self.thread.wait()
@@ -182,18 +191,23 @@ class LayerSearchDialog(QtGui.QDialog, FORM_CLASS):
         self.doneButton.setEnabled(True)
     
     def workerError(self, exception_string):
+        '''An error occurred so display it.'''
         showErrorMessage(exception_string)
     
     def killWorker(self):
+        '''This is initiated when the user presses the Stop button
+        and will stop the search process'''
         if self.worker is not None:
             self.worker.kill()
         
     def clearResults(self):
+        '''Clear all the search results.'''
         self.found = 0
         self.results = []
         self.resultsTable.setRowCount(0)        
     
     def addFoundItem(self, layer, feature, attrname, value):
+        '''We found an item so add it to the found list.'''
         self.resultsTable.insertRow(self.found)
         self.results.append([layer, feature])
         self.resultsTable.setItem(self.found, 0, QtGui.QTableWidgetItem(value))
@@ -202,4 +216,5 @@ class LayerSearchDialog(QtGui.QDialog, FORM_CLASS):
         self.found += 1        
             
     def showErrorMessage(self, message):
+        '''Display an error message.'''
         self.iface.messageBar().pushMessage("", message, level=QgsMessageBar.WARNING, duration=2)
