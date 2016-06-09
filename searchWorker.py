@@ -48,12 +48,12 @@ class Worker(QtCore.QObject):
     def searchLayer(self, layer, str, comparisonMode):
         '''Do a string search across all columns in a table'''
         if self.killed:
-            return;
+            return
         fnames = []
         # Get and Keep a copy of the field names
         for field in layer.pendingFields():
             fnames.append(field.name())
-        # Get an interator for all the features in the vector
+        # Get an iterator for all the features in the vector
         iter = layer.getFeatures(QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry))
         if comparisonMode == 0: # Searching for an exact match
             for feature in iter:
@@ -104,12 +104,12 @@ class Worker(QtCore.QObject):
     def searchFieldInLayer(self, layer, str, comparisonMode, selectedField):
         '''Do a string search on a specific column in the table.'''
         if self.killed:
-            return;
+            return
 
         request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
         request.setSubsetOfAttributes([selectedField], layer.fields())
         if comparisonMode == 0: # Searching for an exact match
-            request.setFilterExpression('"{}" ILIKE \'{}\''.format(selectedField,str))
+            request.setFilterExpression('"{}" LIKE \'{}\''.format(selectedField,str))
         elif comparisonMode == 1: # contains string
             request.setFilterExpression('"{}" ILIKE \'%{}%\''.format(selectedField,str))
         else: # begins with string
