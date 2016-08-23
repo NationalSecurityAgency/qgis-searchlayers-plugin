@@ -29,8 +29,8 @@ class LayerSearchDialog(QtGui.QDialog, FORM_CLASS):
         self.stopButton.clicked.connect(self.killWorker)
         self.searchButton.clicked.connect(self.runSearch)
         self.layerListComboBox.activated.connect(self.layerSelected)
-        self.allFieldsButton.clicked.connect(self.layerSelected)
-        self.inFieldRadioButton.clicked.connect(self.layerSelected)
+        self.searchInComboBox.addItems(['All Fields', 'Specific Field'])
+        self.searchInComboBox.activated.connect(self.layerSelected)
         self.maxResults = 1500
         self.resultsTable.setColumnCount(3)
         self.resultsTable.setSortingEnabled(False)
@@ -101,20 +101,15 @@ class LayerSearchDialog(QtGui.QDialog, FORM_CLASS):
     def initSearchIn(self):
         selectedLayer = self.layerListComboBox.currentIndex()
         if selectedLayer > 1:
-            self.allFieldsButton.setEnabled(True)
-            self.inFieldRadioButton.setEnabled(True)
+            self.searchInComboBox.setEnabled(True)
             self.fieldListComboBox.clear()
             self.fieldListComboBox.setEnabled(True)
-            if self.allFieldsButton.isChecked():
-                self.fieldListComboBox.clear()
-            else:
-                self.fieldListComboBox.clear()
+            if self.searchInComboBox.currentIndex() == 1:
                 for field in self.searchLayers[selectedLayer].pendingFields():
                     self.fieldListComboBox.addItem(field.name())
         else:
-            self.allFieldsButton.setChecked(True)
-            self.allFieldsButton.setEnabled(False)
-            self.inFieldRadioButton.setEnabled(False)
+            self.searchInComboBox.setCurrentIndex(0)
+            self.searchInComboBox.setEnabled(False)
             self.fieldListComboBox.clear()
             self.fieldListComboBox.setEnabled(False)
     
@@ -156,7 +151,7 @@ class LayerSearchDialog(QtGui.QDialog, FORM_CLASS):
         self.doneButton.setEnabled(False)
         self.clearResults()
         self.resultsLabel.setText('')
-        infield = self.inFieldRadioButton.isChecked()
+        infield = self.searchInComboBox.currentIndex() == 1
         if infield is True:
             selectedField = unicode(self.fieldListComboBox.currentText())
         else:
