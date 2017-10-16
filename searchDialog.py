@@ -2,19 +2,19 @@ import os
 import re
 
 from PyQt4 import uic
-from PyQt4 import QtCore, QtGui
+from PyQt4.QtGui import QDialog, QAbstractItemView, QTableWidgetItem
+from PyQt4.QtCore import QThread
 
-#from PyQt4.QtCore import *
-from qgis.core import *
-from qgis.gui import *
-from searchWorker import Worker
+from qgis.core import QgsVectorLayer
+from qgis.gui import QgsMessageBar
+from .searchWorker import Worker
 
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'layersearch.ui'))
 
 
-class LayerSearchDialog(QtGui.QDialog, FORM_CLASS):
+class LayerSearchDialog(QDialog, FORM_CLASS):
     def __init__(self, iface, parent):
         '''Initialize the LayerSearch dialog box'''
         super(LayerSearchDialog, self).__init__(parent)
@@ -28,14 +28,14 @@ class LayerSearchDialog(QtGui.QDialog, FORM_CLASS):
         self.doneButton.clicked.connect(self.closeDialog)
         self.stopButton.clicked.connect(self.killWorker)
         self.searchButton.clicked.connect(self.runSearch)
+        self.clearButton.clicked.connect(self.clearResults)
         self.layerListComboBox.activated.connect(self.layerSelected)
-        self.searchInComboBox.addItems(['All Fields', 'Specific Field'])
-        self.searchInComboBox.activated.connect(self.layerSelected)
+        self.searchFieldComboBox.addItems(['<All Fields>'])
         self.maxResults = 1500
         self.resultsTable.setColumnCount(3)
         self.resultsTable.setSortingEnabled(False)
         self.resultsTable.setHorizontalHeaderLabels(['Value','Layer','Field'])
-        self.resultsTable.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.resultsTable.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.comparisonComboBox.addItems(['=','contains','begins with'])
         self.resultsTable.itemSelectionChanged.connect(self.select_feature)
         self.worker = None
@@ -74,7 +74,7 @@ class LayerSearchDialog(QtGui.QDialog, FORM_CLASS):
     def layerSelected(self):
         '''The user has made a selection so we need to initialize other
         parts of the dialog box'''
-        self.initSearchIn()
+        self.initFieldList()
         
     def showEvent(self, event):
         '''The dialog is being shown. We need to initialize it.'''
@@ -96,22 +96,19 @@ class LayerSearchDialog(QtGui.QDialog, FORM_CLASS):
 
         self.layerListComboBox.clear()
         self.layerListComboBox.addItems(layerlist)
-        self.initSearchIn()
+        self.initFieldList()
         
-    def initSearchIn(self):
+    def initFieldList(self):
         selectedLayer = self.layerListComboBox.currentIndex()
+        self.searchFieldComboBox.clear()
+        self.searchFieldComboBox.addItem('<All Fields>')
         if selectedLayer > 1:
-            self.searchInComboBox.setEnabled(True)
-            self.fieldListComboBox.clear()
-            self.fieldListComboBox.setEnabled(True)
-            if self.searchInComboBox.currentIndex() == 1:
-                for field in self.searchLayers[selectedLayer].pendingFields():
-                    self.fieldListComboBox.addItem(field.name())
+            self.searchFieldComboBox.setEnabled(True)
+            for field in self.searchLayers[selectedLayer].pendingFields():
+                self.searchFieldComboBox.addItem(field.name())
         else:
-            self.searchInComboBox.setCurrentIndex(0)
-            self.searchInComboBox.setEnabled(False)
-            self.fieldListComboBox.clear()
-            self.fieldListComboBox.setEnabled(False)
+            self.searchFieldComboBox.setCurrentIndex(0)
+            self.searchFieldComboBox.setEnabled(False)
     
     def runSearch(self):
         '''Called when the user pushes the Search button'''
@@ -149,17 +146,18 @@ class LayerSearchDialog(QtGui.QDialog, FORM_CLASS):
         self.searchButton.setEnabled(False)
         self.stopButton.setEnabled(True)
         self.doneButton.setEnabled(False)
+        self.clearButton.setEnabled(False)
         self.clearResults()
         self.resultsLabel.setText('')
-        infield = self.searchInComboBox.currentIndex() == 1
+        infield = self.searchFieldComboBox.currentIndex() >= 1
         if infield is True:
-            selectedField = unicode(self.fieldListComboBox.currentText())
+            selectedField = unicode(self.searchFieldComboBox.currentText())
         else:
             selectedField = None
         
         # Because this could take a lot of time, set up a separate thread
         # for a worker function to do the searching.
-        thread = QtCore.QThread()
+        thread = QThread()
         worker = Worker(self.vlayers, infield, str, comparisonMode, selectedField, self.maxResults)
         worker.moveToThread(thread)
         thread.started.connect(worker.run)
@@ -182,6 +180,7 @@ class LayerSearchDialog(QtGui.QDialog, FORM_CLASS):
 
         self.vlayers = []
         self.searchButton.setEnabled(True)
+        self.clearButton.setEnabled(True)
         self.stopButton.setEnabled(False)
         self.doneButton.setEnabled(True)
     
@@ -197,17 +196,19 @@ class LayerSearchDialog(QtGui.QDialog, FORM_CLASS):
         
     def clearResults(self):
         '''Clear all the search results.'''
+        self.noSelection = True
         self.found = 0
         self.results = []
         self.resultsTable.setRowCount(0)        
+        self.noSelection = False
     
     def addFoundItem(self, layer, feature, attrname, value):
         '''We found an item so add it to the found list.'''
         self.resultsTable.insertRow(self.found)
         self.results.append([layer, feature])
-        self.resultsTable.setItem(self.found, 0, QtGui.QTableWidgetItem(value))
-        self.resultsTable.setItem(self.found, 1, QtGui.QTableWidgetItem(layer.name()))
-        self.resultsTable.setItem(self.found, 2, QtGui.QTableWidgetItem(attrname))
+        self.resultsTable.setItem(self.found, 0, QTableWidgetItem(value))
+        self.resultsTable.setItem(self.found, 1, QTableWidgetItem(layer.name()))
+        self.resultsTable.setItem(self.found, 2, QTableWidgetItem(attrname))
         self.found += 1        
             
     def showErrorMessage(self, message):

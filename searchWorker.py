@@ -2,20 +2,19 @@ import os
 import re
 
 from PyQt4 import uic
-from PyQt4 import QtCore, QtGui
+from PyQt4.QtCore import QObject, pyqtSignal
 
-from qgis.core import *
-from qgis.gui import *
+from qgis.core import QgsVectorLayer, QgsFeatureRequest
 
-class Worker(QtCore.QObject):
+class Worker(QObject):
     '''This does all the hard work. It takes all the search parameters and 
     searches through the vector layers for a match.'''
-    finished = QtCore.pyqtSignal(bool)
-    error = QtCore.pyqtSignal(str)
-    foundmatch = QtCore.pyqtSignal(QgsVectorLayer, object, object, unicode)
+    finished = pyqtSignal(bool)
+    error = pyqtSignal(str)
+    foundmatch = pyqtSignal(QgsVectorLayer, object, object, unicode)
     
     def __init__(self, vlayers, infield, str, comparisonMode, selectedField, maxResults):
-        QtCore.QObject.__init__(self)
+        QObject.__init__(self)
         self.vlayers = vlayers
         self.infield = infield
         self.str = str

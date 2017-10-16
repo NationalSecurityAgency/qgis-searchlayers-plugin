@@ -1,15 +1,15 @@
 [general]
-name=Layer Search
-qgisMinimumVersion=2.0
-description=Enhanced searching on all QGIS layers and fields.
-version=0.1.1
+name=Search Layers
+qgisMinimumVersion=2.12
+description=Enhanced textual searching on all QGIS layers and fields.
+version=0.2
 author=C Hamilton
 email=adenaculture@gmail.com
-about=The Layer Search plugin features enhanced textual vector layer searching in QGIS. The existing QGIS searching capabilities are limited to a particular layer and a particular column. What is different about this plugin is that it will search all layers and all fields for a particular string.
+about=The Search Layers plugin features enhanced textual vector layer searching in QGIS. The existing QGIS searching capabilities are limited to a particular layer and a particular column. The difference with this plugin is that it will do a string search across all layers and all fields.
 tracker=https://github.com/NationalSecurityAgency/qgis-layersearch-plugin/issues
 repository=https://github.com/NationalSecurityAgency/qgis-layersearch-plugin
 homepage=https://github.com/NationalSecurityAgency/qgis-layersearch-plugin
-tags=qgis,search
+tags=search,find,textual search
 category=Plugins
 icon=icon.png
 experimental=False

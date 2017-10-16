@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/plugins/layersearch" >
-        <file>icon.png</file>
-    </qresource>
-</RCC>

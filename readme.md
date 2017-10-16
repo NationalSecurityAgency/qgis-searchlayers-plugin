@@ -1,22 +1,22 @@
-#Layer Search Plugin
+# Search Layers Plugin
 
-The Layer Search plugin features enhanced textual vector layer searching in QGIS. The existing QGIS searching capabilities are limited to a particular layer and a particular column. What is different about this plugin is that it will search all layers and all fields for a particular string.
+The Search Layers plugin features enhanced textual vector layer searching in QGIS. The existing QGIS searching capabilities are limited to a particular layer and a particular column. The difference with this plugin is that it will do a string search across all layers and all fields.
 
-Layer Search will be located in the QGIS Plugins menu under *"Plugins-&gt;Search-&gt;Search Layer(s)"* or by selecting the tool bar icon. ![Toolbar Icon](icon.png)
+Search Layers is located in the QGIS Plugins menu under *"Plugins->Search Layers->Search Layers"* or by selecting the tool bar icon. ![Toolbar Icon](icon.png)
 
-The following dialog box is displayed when the “Search Layer(s)” is launched.
+The following dialog box is displayed when "Search Layers" is launched.
 
-![Layer Search Dialog](doc/layersearch.jpg)
+![Search Layers Dialog](doc/layersearch.jpg)
 
-Enter the search string into the **Find** field. You can search **In** *&lt;All Layers&gt;*, *&lt;Selected layers&gt;*, or on any of the vector layers in your project. Note that only vector layers will be listed. **Comparison** is the matching criteria. It can be.
+Under **Search String**, enter the search string. **Search Layers** specifies whether the search will be on *&lt;All Layers&gt;*, *&lt;Selected layers&gt;*, or on any of the vector layers in the QGIS project. If a specific layer is selected then **Search Fields** will be enabled and by default *&lt;All Fields&gt;* will be selected, but any field can be selected from the layer and the search will only search on that layer and field.
+
+**Comparison** is the matching criteria and is as follows.
 
 * **=** - This requires an exact match including case.
-* **Contains** - This performs a case independent search in which the search finds any item where a field contains the search string.
+* **Contains** - This performs a case independent search in which a match is made if a field contains the search string.
 * **Begins with** - This is a case independent search in which the search finds any field that begins with the search string.
 
-**Search in** is only enable when a specific vector layer is selected and in that case you can specify which column you want to search.
+Click  the **Search** button to begin the search. In the case of a large data set, clicking on **Stop** will halt the process. Note that the plugin stops after finding 1500 matches.
 
-Click on the **Search** button to begin the search. In the case of a large data set you can click on **Stop** at any time to halt the process. Note that this plugin stops after finding 1500 matches.
-
-Once matches are found, by clicking on them QGIS will zoom to that feature, select, and highlight it.
+When matches are found and clicked on, QGIS zooms to the feature, selects it, and highlights it. The matches can be examined even before the search process has been completed.
 
