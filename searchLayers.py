@@ -6,7 +6,7 @@ import webbrowser
 
 from .searchDialog import LayerSearchDialog
 
-class LayerSearch:
+class SearchLayers:
     def __init__(self, iface):
         self.iface = iface
         self.searchDialog = None

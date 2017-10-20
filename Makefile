@@ -1,7 +1,7 @@
-PLUGINNAME = layersearch
-PY_FILES = layerSearch.py __init__.py searchDialog.py searchWorker.py
+PLUGINNAME = searchlayers
+PY_FILES = searchLayers.py __init__.py searchDialog.py searchWorker.py
 EXTRAS = icon.png help.png metadata.txt
-UI_FILES = layersearch.ui
+UI_FILES = searchlayers.ui
 
 default: compile
 

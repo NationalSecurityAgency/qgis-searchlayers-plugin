@@ -11,7 +11,7 @@ from .searchWorker import Worker
 
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'layersearch.ui'))
+    os.path.dirname(__file__), 'searchlayers.ui'))
 
 
 class LayerSearchDialog(QDialog, FORM_CLASS):
