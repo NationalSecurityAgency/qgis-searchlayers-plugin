@@ -2,7 +2,7 @@
 name=Search Layers
 qgisMinimumVersion=2.0
 description=Enhanced textual searching on all QGIS layers and fields.
-version=0.2
+version=0.2.1
 author=C Hamilton
 email=adenaculture@gmail.com
 about=The Search Layers plugin features enhanced textual vector layer searching in QGIS. The existing QGIS searching capabilities are limited to a particular layer and a particular column. The difference with this plugin is that it will do a string search across all layers and all fields.
@@ -14,3 +14,5 @@ category=Plugins
 icon=icon.png
 experimental=False
 deprecated=False
+changelog=
+    0.2.1 - Bug fix

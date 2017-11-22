@@ -186,7 +186,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
     
     def workerError(self, exception_string):
         '''An error occurred so display it.'''
-        showErrorMessage(exception_string)
+        self.showErrorMessage(exception_string)
     
     def killWorker(self):
         '''This is initiated when the user presses the Stop button
