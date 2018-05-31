@@ -15,6 +15,7 @@ class SearchLayers:
         # Create the menu items in the Plugin menu and attach the icon to the toolbar
         icon = QIcon(os.path.dirname(__file__) + "/icon.png")
         self.searchAction = QAction(icon, "Search Layers", self.iface.mainWindow())
+        self.searchAction.setObjectName('searchLayers')
         self.searchAction.triggered.connect(self.showSearchDialog)
         self.iface.addToolBarIcon(self.searchAction)
         self.iface.addPluginToMenu("Search Layers", self.searchAction)
@@ -22,6 +23,7 @@ class SearchLayers:
         # Help
         icon = QIcon(os.path.dirname(__file__) + '/help.png')
         self.helpAction = QAction(icon, "Help", self.iface.mainWindow())
+        self.helpAction.setObjectName('searchLayersHelp')
         self.helpAction.triggered.connect(self.help)
         self.iface.addPluginToMenu('Search Layers', self.helpAction)
 
