@@ -1,16 +1,15 @@
 import os
 import re
 
-from PyQt4 import uic
-from PyQt4.QtGui import QDialog, QAbstractItemView, QTableWidgetItem
-from PyQt4.QtCore import QThread
+from qgis.PyQt.uic import loadUiType
+from qgis.PyQt.QtWidgets import QDialog, QAbstractItemView, QTableWidgetItem
+from qgis.PyQt.QtCore import QThread
 
-from qgis.core import QgsVectorLayer
-from qgis.gui import QgsMessageBar
+from qgis.core import QgsVectorLayer, Qgis, QgsProject, QgsMapLayer
 from .searchWorker import Worker
 
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
+FORM_CLASS, _ = loadUiType(os.path.join(
     os.path.dirname(__file__), 'searchlayers.ui'))
 
 
@@ -22,8 +21,8 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.iface = iface
         self.canvas = iface.mapCanvas()
         # Notify us when vector items ared added and removed in QGIS
-        iface.legendInterface().itemAdded.connect(self.updateLayers)
-        iface.legendInterface().itemRemoved.connect(self.updateLayers)
+        QgsProject.instance().layersAdded.connect(self.updateLayers)
+        QgsProject.instance().layersRemoved.connect(self.updateLayers)
         
         self.doneButton.clicked.connect(self.closeDialog)
         self.stopButton.clicked.connect(self.killWorker)
@@ -51,6 +50,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.killWorker()
         if self.isVisible():
             self.populateLayerListComboBox()
+            self.clearResults()
         
     def select_feature(self):
         '''A feature has been selected from the list so we need to select
@@ -59,9 +59,9 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
             # We do not want this event while data is being changed
             return
         # Deselect all selections
-        layers = self.iface.legendInterface().layers()
+        layers = QgsProject.instance().mapLayers().values()
         for layer in layers:
-            if isinstance(layer, QgsVectorLayer):
+            if layer.type() == QgsMapLayer.VectorLayer:
                 layer.removeSelection()
         # Find the layer that was selected and select the feature in the layer
         selectedRow = self.resultsTable.currentRow()
@@ -87,10 +87,10 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         layers or all selected layers.'''
         layerlist = ['<All Layers>','<Selected Layers>']
         self.searchLayers = [None, None] # This is same size as layerlist
-        layers = self.iface.legendInterface().layers()
+        layers = QgsProject.instance().mapLayers().values()
         
         for layer in layers:
-            if isinstance(layer, QgsVectorLayer):
+            if layer.type() == QgsMapLayer.VectorLayer:
                 layerlist.append(layer.name())
                 self.searchLayers.append(layer)
 
@@ -104,7 +104,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.searchFieldComboBox.addItem('<All Fields>')
         if selectedLayer > 1:
             self.searchFieldComboBox.setEnabled(True)
-            for field in self.searchLayers[selectedLayer].pendingFields():
+            for field in self.searchLayers[selectedLayer].fields():
                 self.searchFieldComboBox.addItem(field.name())
         else:
             self.searchFieldComboBox.setCurrentIndex(0)
@@ -116,7 +116,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         comparisonMode = self.comparisonComboBox.currentIndex()
         self.noSelection = True
         try:
-            str = unicode(self.findStringEdit.text()).strip()
+            sstr = self.findStringEdit.text().strip()
         except:
             self.showErrorMessage('Invalid Search String')
             return
@@ -126,10 +126,10 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
             return
         if selectedLayer == 0:
             # Include all vector layers
-            layers = self.iface.legendInterface().layers()
+            layers = QgsProject.instance().mapLayers().values()
         elif selectedLayer == 1:
             # Include all selected vector layers
-            layers = self.iface.legendInterface().selectedLayers()
+            layers = self.iface.layerTreeView().selectedLayers()
         else:
             # Only search on the selected vector layer
             layers = [self.searchLayers[selectedLayer]]
@@ -151,14 +151,14 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.resultsLabel.setText('')
         infield = self.searchFieldComboBox.currentIndex() >= 1
         if infield is True:
-            selectedField = unicode(self.searchFieldComboBox.currentText())
+            selectedField = self.searchFieldComboBox.currentText()
         else:
             selectedField = None
         
         # Because this could take a lot of time, set up a separate thread
         # for a worker function to do the searching.
         thread = QThread()
-        worker = Worker(self.vlayers, infield, str, comparisonMode, selectedField, self.maxResults)
+        worker = Worker(self.vlayers, infield, sstr, comparisonMode, selectedField, self.maxResults)
         worker.moveToThread(thread)
         thread.started.connect(worker.run)
         worker.finished.connect(self.workerFinished)
@@ -186,7 +186,8 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
     
     def workerError(self, exception_string):
         '''An error occurred so display it.'''
-        self.showErrorMessage(exception_string)
+        #self.showErrorMessage(exception_string)
+        print(exception_string)
     
     def killWorker(self):
         '''This is initiated when the user presses the Stop button
@@ -213,4 +214,4 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
             
     def showErrorMessage(self, message):
         '''Display an error message.'''
-        self.iface.messageBar().pushMessage("", message, level=QgsMessageBar.WARNING, duration=2)
+        self.iface.messageBar().pushMessage("", message, level=Qgis.Warning, duration=2)

@@ -1,5 +1,6 @@
-from PyQt4.QtCore import QUrl
-from PyQt4.QtGui import QIcon, QAction
+from qgis.PyQt.QtCore import QUrl
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction
 
 import os
 import webbrowser

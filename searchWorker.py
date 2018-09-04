@@ -1,23 +1,23 @@
 import os
 import re
 
-from PyQt4 import uic
-from PyQt4.QtCore import QObject, pyqtSignal
+from qgis.PyQt.QtCore import QObject, pyqtSignal
 
 from qgis.core import QgsVectorLayer, QgsFeatureRequest
+import traceback
 
 class Worker(QObject):
     '''This does all the hard work. It takes all the search parameters and 
     searches through the vector layers for a match.'''
     finished = pyqtSignal(bool)
     error = pyqtSignal(str)
-    foundmatch = pyqtSignal(QgsVectorLayer, object, object, unicode)
+    foundmatch = pyqtSignal(QgsVectorLayer, object, object, str)
     
-    def __init__(self, vlayers, infield, str, comparisonMode, selectedField, maxResults):
+    def __init__(self, vlayers, infield, searchStr, comparisonMode, selectedField, maxResults):
         QObject.__init__(self)
         self.vlayers = vlayers
         self.infield = infield
-        self.str = str
+        self.searchStr = searchStr
         self.comparisonMode = comparisonMode
         self.selectedField = selectedField
         self.killed = False
@@ -31,12 +31,11 @@ class Worker(QObject):
             # layer or whether we are searching all columns.
             if self.infield is True:
                 for layer in self.vlayers:
-                    self.searchFieldInLayer(layer, self.str, self.comparisonMode, self.selectedField)
+                    self.searchFieldInLayer(layer, self.searchStr, self.comparisonMode, self.selectedField)
             else:
                 for layer in self.vlayers:
-                    self.searchLayer(layer, self.str, self.comparisonMode)
+                    self.searchLayer(layer, self.searchStr, self.comparisonMode)
         except:
-            import traceback
             self.error.emit(traceback.format_exc())
         self.finished.emit(True)
             
@@ -44,13 +43,13 @@ class Worker(QObject):
         '''Set a flag that we want to stop looking for matches.'''
         self.killed = True
         
-    def searchLayer(self, layer, str, comparisonMode):
+    def searchLayer(self, layer, searchStr, comparisonMode):
         '''Do a string search across all columns in a table'''
         if self.killed:
             return
         fnames = []
         # Get and Keep a copy of the field names
-        for field in layer.pendingFields():
+        for field in layer.fields():
             fnames.append(field.name())
         # Get an iterator for all the features in the vector
         iter = layer.getFeatures(QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry))
@@ -64,8 +63,8 @@ class Worker(QObject):
                 # For now just search as if it were a string
                 for id, f in enumerate(attrs):
                     try:
-                        if unicode(f) == str:
-                            self.foundmatch.emit(layer, feature, fnames[id], unicode(f))
+                        if str(f) == searchStr:
+                            self.foundmatch.emit(layer, feature, fnames[id], str(f))
                             self.found += 1
                             if self.found >= self.maxResults:
                                 self.killed=True
@@ -73,7 +72,7 @@ class Worker(QObject):
                     except:
                         pass
         elif comparisonMode == 1: # contains string
-            p = re.compile(re.escape(str), re.I|re.UNICODE)
+            p = re.compile(re.escape(searchStr), re.I|re.UNICODE)
             for feature in iter:
                 # Check to see if it has been aborted
                 if self.killed is True:
@@ -82,8 +81,8 @@ class Worker(QObject):
                 # For now just search as if it were a string
                 for id, f in enumerate(attrs):
                     try:
-                        if p.search(unicode(f)):
-                            self.foundmatch.emit(layer, feature, fnames[id], unicode(f))
+                        if p.search(str(f)):
+                            self.foundmatch.emit(layer, feature, fnames[id], str(f))
                             self.found += 1
                             if self.found >= self.maxResults:
                                 self.killed=True
@@ -91,7 +90,7 @@ class Worker(QObject):
                     except:
                         pass
         else: # begins with string
-            p = re.compile(re.escape(str), re.I|re.UNICODE)
+            p = re.compile(re.escape(searchStr), re.I|re.UNICODE)
             for feature in iter:
                 # Check to see if it has been aborted
                 if self.killed is True:
@@ -100,8 +99,8 @@ class Worker(QObject):
                 # For now just search as if it were a string
                 for id, f in enumerate(attrs):
                     try:
-                        if p.match(unicode(f)):
-                            self.foundmatch.emit(layer, feature, fnames[id], unicode(f))
+                        if p.match(str(f)):
+                            self.foundmatch.emit(layer, feature, fnames[id], str(f))
                             self.found += 1
                             if self.found >= self.maxResults:
                                 self.killed=True
@@ -109,7 +108,7 @@ class Worker(QObject):
                     except:
                         pass
 
-    def searchFieldInLayer(self, layer, str, comparisonMode, selectedField):
+    def searchFieldInLayer(self, layer, searchStr, comparisonMode, selectedField):
         '''Do a string search on a specific column in the table.'''
         if self.killed:
             return
@@ -117,18 +116,18 @@ class Worker(QObject):
         request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
         request.setSubsetOfAttributes([selectedField], layer.fields())
         if comparisonMode == 0: # Searching for an exact match
-            request.setFilterExpression(u'"{}" LIKE \'{}\''.format(selectedField,str))
+            request.setFilterExpression('"{}" LIKE \'{}\''.format(selectedField,searchStr))
         elif comparisonMode == 1: # contains string
-            request.setFilterExpression(u'"{}" ILIKE \'%{}%\''.format(selectedField,str))
+            request.setFilterExpression('"{}" ILIKE \'%{}%\''.format(selectedField,searchStr))
         else: # begins with string
-            request.setFilterExpression(u'"{}" ILIKE \'{}%\''.format(selectedField,str))
+            request.setFilterExpression('"{}" ILIKE \'{}%\''.format(selectedField,searchStr))
 
         for feature in layer.getFeatures(request):
             # Check to see if it has been aborted
             if self.killed is True:
                 return
             f = feature.attribute(selectedField)
-            self.foundmatch.emit(layer, feature, selectedField, unicode(f))
+            self.foundmatch.emit(layer, feature, selectedField, str(f))
             self.found += 1
             if self.found >= self.maxResults:
                 self.killed=True
