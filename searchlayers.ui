@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>517</width>
-    <height>440</height>
+    <height>461</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -68,6 +68,16 @@
       </layout>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="autoZoomCheckBox">
+     <property name="text">
+      <string>Automatically zoom to selected features</string>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QTableWidget" name="resultsTable"/>

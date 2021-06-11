@@ -1,0 +1,52 @@
+<head>
+<style>
+body {
+    font:13.34px helvetica,arial,freesans,clean,sans-serif;
+    color:black;
+    line-height:1.4em;
+    background-color: #F8F8F8;
+    padding: 0.7em;
+}
+pre {
+    margin:1em 0;
+    font-size:12px;
+    background-color:#eee;
+    border:1px solid #ddd;
+    padding:5px;
+    line-height:1.5em;
+    color:#444;
+    overflow:auto;
+    -webkit-box-shadow:rgba(0,0,0,0.07) 0 1px 2px inset;
+    -webkit-border-radius:3px;
+    -moz-border-radius:3px;border-radius:3px;
+}
+pre code {
+    padding:0;
+    font-size:12px;
+    background-color:#eee;
+    border:none;
+}
+code {
+    font-size:12px;
+    background-color:#f8f8ff;
+    color:#444;
+    padding:0 .2em;
+    border:1px solid #dedede;
+}
+</style>
+</head>
+<body>
+<h1>Search Layers Plugin</h1>
+<p>The Search Layers plugin features enhanced textual vector layer searching in QGIS. It provides the ability to search across all layers and all fields.</p>
+<p>Search Layers is located in the QGIS Plugins menu under <em>"Plugins-&gt;Search Layers-&gt;Search Layers"</em> or by selecting the tool bar icon. <img alt="Toolbar Icon" src="icon.png" /></p>
+<p>The following dialog box is displayed when "Search Layers" is launched.</p>
+<p><img alt="Search Layers Dialog" src="doc/layersearch.jpg" /></p>
+<p>Under <strong>Search String</strong>, enter the search string. <strong>Search Layers</strong> specifies whether the search will be on <em>&lt;All Layers&gt;</em>, <em>&lt;Selected layers&gt;</em>, or on any of the vector layers in the QGIS project. If a specific layer is selected then <strong>Search Fields</strong> will be enabled and by default <em>&lt;All Fields&gt;</em> will be selected, but any field can be selected from the layer and the search will only search on that layer and field.</p>
+<p><strong>Comparison</strong> is the matching criteria and is as follows.</p>
+<ul>
+<li><strong>=</strong> - This requires an exact match including case.</li>
+<li><strong>Contains</strong> - This performs a case independent search in which a match is made if a field contains the search string.</li>
+<li><strong>Begins with</strong> - This is a case independent search in which the search finds any field that begins with the search string.</li>
+</ul>
+<p>Click  the <strong>Search</strong> button to begin the search. In the case of a large data set, clicking on <strong>Stop</strong> will halt the process. Note that the plugin stops after finding 1500 matches.</p>
+<p>When matches are found and clicked on, the features are highlighted on the map. If <strong>Automatically zoom to selected features</strong> is checked, QGIS also zooms to the selected features. The matches can be examined even before the search process has been completed.</p></body>

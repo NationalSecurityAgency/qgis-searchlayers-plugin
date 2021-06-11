@@ -63,13 +63,17 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         for layer in layers:
             if layer.type() == QgsMapLayer.VectorLayer:
                 layer.removeSelection()
-        # Find the layer that was selected and select the feature in the layer
-        selectedRow = self.resultsTable.currentRow()
-        selectedLayer = self.results[selectedRow][0]
-        selectedFeature = self.results[selectedRow][1]
-        selectedLayer.select(selectedFeature.id())
+        # Find the layers that are selected and select the features in the layer
+        selectedItems = self.resultsTable.selectedItems()
+        selectedLayer = None
+        for item in selectedItems:
+            selectedRow = item.row()
+            selectedLayer = self.results[selectedRow][0]
+            selectedFeature = self.results[selectedRow][1]
+            selectedLayer.select(selectedFeature.id())
         # Zoom to the selected feature
-        self.canvas.zoomToSelected(selectedLayer)
+        if selectedLayer and self.autoZoomCheckBox.isChecked():
+            self.canvas.zoomToSelected(selectedLayer)
     
     def layerSelected(self):
         '''The user has made a selection so we need to initialize other
@@ -116,7 +120,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         comparisonMode = self.comparisonComboBox.currentIndex()
         self.noSelection = True
         try:
-            sstr = self.findStringEdit.text().strip()
+            sstr = self.findStringEdit.text()
         except:
             self.showErrorMessage('Invalid Search String')
             return

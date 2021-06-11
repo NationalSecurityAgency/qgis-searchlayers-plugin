@@ -1,6 +1,6 @@
 # Search Layers Plugin
 
-The Search Layers plugin features enhanced textual vector layer searching in QGIS. The existing QGIS searching capabilities are limited to a particular layer and a particular column. The difference with this plugin is that it will do a string search across all layers and all fields.
+The Search Layers plugin features enhanced textual vector layer searching in QGIS. It provides the ability to search across all layers and all fields.
 
 Search Layers is located in the QGIS Plugins menu under *"Plugins->Search Layers->Search Layers"* or by selecting the tool bar icon. ![Toolbar Icon](icon.png)
 
@@ -18,5 +18,5 @@ Under **Search String**, enter the search string. **Search Layers** specifies wh
 
 Click  the **Search** button to begin the search. In the case of a large data set, clicking on **Stop** will halt the process. Note that the plugin stops after finding 1500 matches.
 
-When matches are found and clicked on, QGIS zooms to the feature, selects it, and highlights it. The matches can be examined even before the search process has been completed.
+When matches are found and clicked on, the features are highlighted on the map. If **Automatically zoom to selected features** is checked, QGIS also zooms to the selected features. The matches can be examined even before the search process has been completed.
 
