@@ -2,8 +2,8 @@ import os
 import re
 
 from qgis.PyQt.uic import loadUiType
-from qgis.PyQt.QtWidgets import QDialog, QAbstractItemView, QTableWidgetItem
-from qgis.PyQt.QtCore import QThread
+from qgis.PyQt.QtWidgets import QDialog, QAbstractItemView, QTableWidget, QTableWidgetItem
+from qgis.PyQt.QtCore import Qt, QThread
 
 from qgis.core import QgsVectorLayer, Qgis, QgsProject, QgsMapLayer
 from .searchWorker import Worker
@@ -23,7 +23,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         # Notify us when vector items ared added and removed in QGIS
         QgsProject.instance().layersAdded.connect(self.updateLayers)
         QgsProject.instance().layersRemoved.connect(self.updateLayers)
-        
+
         self.doneButton.clicked.connect(self.closeDialog)
         self.stopButton.clicked.connect(self.killWorker)
         self.searchButton.clicked.connect(self.runSearch)
@@ -31,18 +31,18 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.layerListComboBox.activated.connect(self.layerSelected)
         self.searchFieldComboBox.addItems(['<All Fields>'])
         self.maxResults = 1500
+        self.resultsTable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.resultsTable.setColumnCount(4)
-        self.resultsTable.setSortingEnabled(False)
-        self.resultsTable.setHorizontalHeaderLabels(['Value','Layer','Field','Feature Id'])
+        self.resultsTable.setSortingEnabled(True)
+        self.resultsTable.setHorizontalHeaderLabels(['Layer','Feature ID','Field','Search Results'])
         self.resultsTable.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.comparisonComboBox.addItems(['=','contains','begins with'])
         self.resultsTable.itemSelectionChanged.connect(self.select_feature)
         self.worker = None
 
     def closeDialog(self):
         '''Close the dialog box when the Close button is pushed'''
         self.hide()
-    
+
     def updateLayers(self):
         '''Called when a layer has been added or deleted in QGIS.
         It forces the dialog to reload.'''
@@ -51,7 +51,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         if self.isVisible():
             self.populateLayerListComboBox()
             self.clearResults()
-        
+
     def select_feature(self):
         '''A feature has been selected from the list so we need to select
         and zoom to it'''
@@ -68,23 +68,28 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         selectedLayer = None
         for item in selectedItems:
             selectedRow = item.row()
-            selectedLayer = self.results[selectedRow][0]
-            selectedFeature = self.results[selectedRow][1]
+            foundid = self.resultsTable.item(selectedRow, 0).data(Qt.UserRole)
+            selectedLayer = self.results[foundid][0]
+            selectedFeature = self.results[foundid][1]
             selectedLayer.select(selectedFeature.id())
         # Zoom to the selected feature
-        if selectedLayer and self.autoZoomCheckBox.isChecked():
-            self.canvas.zoomToSelected(selectedLayer)
-    
+        zoom_pan = self.zoomPanComboBox.currentIndex()
+        if selectedLayer and zoom_pan:
+            if zoom_pan == 1:
+                self.canvas.zoomToSelected(selectedLayer)
+            else:
+                self.canvas.panToSelected(selectedLayer)
+
     def layerSelected(self):
         '''The user has made a selection so we need to initialize other
         parts of the dialog box'''
         self.initFieldList()
-        
+
     def showEvent(self, event):
         '''The dialog is being shown. We need to initialize it.'''
         super(LayerSearchDialog, self).showEvent(event)
         self.populateLayerListComboBox()
-        
+
     def populateLayerListComboBox(self):
         '''Find all the vector layers and add them to the layer list
         that the user can select. In addition the user can search on all
@@ -92,7 +97,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         layerlist = ['<All Layers>','<Selected Layers>']
         self.searchLayers = [None, None] # This is same size as layerlist
         layers = QgsProject.instance().mapLayers().values()
-        
+
         for layer in layers:
             if layer.type() == QgsMapLayer.VectorLayer:
                 layerlist.append(layer.name())
@@ -101,7 +106,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.layerListComboBox.clear()
         self.layerListComboBox.addItems(layerlist)
         self.initFieldList()
-        
+
     def initFieldList(self):
         selectedLayer = self.layerListComboBox.currentIndex()
         self.searchFieldComboBox.clear()
@@ -113,21 +118,41 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         else:
             self.searchFieldComboBox.setCurrentIndex(0)
             self.searchFieldComboBox.setEnabled(False)
-    
+
+    def initSearchResultsTable(self):
+        self.clearResults()
+        if self.is_single_string or self.two_string_match_single:
+            self.resultsTable.setColumnCount(4)
+            self.resultsTable.setHorizontalHeaderLabels(['Layer','Feature ID','Field','Results'])
+        else:
+            self.resultsTable.setColumnCount(6)
+            self.resultsTable.setHorizontalHeaderLabels(['Layer','Feature ID','Field 1','Results 1','Field 2','Results 2'])
+
     def runSearch(self):
         '''Called when the user pushes the Search button'''
         selectedLayer = self.layerListComboBox.currentIndex()
         comparisonMode = self.comparisonComboBox.currentIndex()
+        comparisonMode2 = self.comparison2ComboBox.currentIndex()
+        and_or = self.andOrComboBox.currentIndex()
+        case_sensitive = self.caseSensitiveCheckBox.isChecked()
+        case_sensitive2 = self.caseSensitive2CheckBox.isChecked()
+        self.two_string_match_single = self.twoStringMatchCheckBox.isChecked()
+        self.first_match_only = self.firstMatchCheckBox.isChecked()
         self.noSelection = True
         try:
             sstr = self.findStringEdit.text()
+            sstr2 = self.findString2Edit.text()
         except:
             self.showErrorMessage('Invalid Search String')
             return
             
-        if str == '':
+        if sstr == '':
             self.showErrorMessage('Search string is empty')
             return
+        if sstr2 == '':
+            self.is_single_string = True
+        else:
+            self.is_single_string = False
         if selectedLayer == 0:
             # Include all vector layers
             layers = QgsProject.instance().mapLayers().values()
@@ -147,22 +172,26 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
             return
         
         # vlayers contains the layers that we will search in
+        self.initSearchResultsTable()
         self.searchButton.setEnabled(False)
         self.stopButton.setEnabled(True)
         self.doneButton.setEnabled(False)
         self.clearButton.setEnabled(False)
-        self.clearResults()
         self.resultsLabel.setText('')
         infield = self.searchFieldComboBox.currentIndex() >= 1
         if infield is True:
             selectedField = self.searchFieldComboBox.currentText()
         else:
             selectedField = None
+        not_search = self.notCheckBox.isChecked()
+        not_search2 = self.not2CheckBox.isChecked()
         
         # Because this could take a lot of time, set up a separate thread
         # for a worker function to do the searching.
         thread = QThread()
-        worker = Worker(self.vlayers, infield, sstr, comparisonMode, selectedField, self.maxResults)
+        worker = Worker(self.vlayers, infield, sstr, comparisonMode, case_sensitive, not_search, 
+            and_or, sstr2, comparisonMode2, case_sensitive2, not_search2,
+            selectedField, self.maxResults, self.first_match_only, self.two_string_match_single)
         worker.moveToThread(thread)
         thread.started.connect(worker.run)
         worker.finished.connect(self.workerFinished)
@@ -207,15 +236,29 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.resultsTable.setRowCount(0)        
         self.noSelection = False
     
-    def addFoundItem(self, layer, feature, attrname, value):
+    def addFoundItem(self, layer, feature, attrname1, results1, attrname2, results2):
         '''We found an item so add it to the found list.'''
+        # Don't allow sorting while adding new results
+        self.resultsTable.setSortingEnabled(False)
         self.resultsTable.insertRow(self.found)
         self.results.append([layer, feature])
-        self.resultsTable.setItem(self.found, 0, QTableWidgetItem(value))
-        self.resultsTable.setItem(self.found, 1, QTableWidgetItem(layer.name()))
-        self.resultsTable.setItem(self.found, 2, QTableWidgetItem(attrname))
-        self.resultsTable.setItem(self.found, 3, QTableWidgetItem(str(feature.id())))
-        self.found += 1        
+        # Save the search found position in the first element of the table. This way
+        # we can allow the user to sort the table, but be able to know which entry it is.
+        item = QTableWidgetItem(layer.name())
+        item.setData(Qt.UserRole, self.found)
+        self.resultsTable.setItem(self.found, 0, item)
+        self.resultsTable.setItem(self.found, 1, QTableWidgetItem(str(feature.id())))
+        if self.is_single_string or self.two_string_match_single:
+            self.resultsTable.setItem(self.found, 2, QTableWidgetItem(attrname1))
+            self.resultsTable.setItem(self.found, 3, QTableWidgetItem(results1))
+        else:
+            self.resultsTable.setItem(self.found, 2, QTableWidgetItem(attrname1))
+            self.resultsTable.setItem(self.found, 3, QTableWidgetItem(results1))
+            self.resultsTable.setItem(self.found, 4, QTableWidgetItem(attrname2))
+            self.resultsTable.setItem(self.found, 5, QTableWidgetItem(results2))
+        self.found += 1   
+        # Restore sorting
+        self.resultsTable.setSortingEnabled(True)
             
     def showErrorMessage(self, message):
         '''Display an error message.'''

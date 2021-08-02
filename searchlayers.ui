@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>517</width>
-    <height>461</height>
+    <width>554</width>
+    <height>573</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,69 +15,260 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>Search criteria</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QFormLayout" name="formLayout_2">
+     <item row="0" column="0">
+      <widget class="QCheckBox" name="notCheckBox">
+       <property name="text">
+        <string>NOT</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
-        <layout class="QFormLayout" name="formLayout">
-         <property name="fieldGrowthPolicy">
-          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-         </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Search String</string>
+        <widget class="QLineEdit" name="findStringEdit"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QComboBox" name="comparisonComboBox">
+           <property name="currentIndex">
+            <number>1</number>
            </property>
+           <item>
+            <property name="text">
+             <string>equals</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>contains</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>begins with</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>ends with</string>
+            </property>
+           </item>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="findStringEdit"/>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_2">
+         <item>
+          <widget class="QCheckBox" name="caseSensitiveCheckBox">
            <property name="text">
-            <string>Search Layers</string>
+            <string>Case sensitive</string>
            </property>
           </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="layerListComboBox"/>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Search Fields</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QComboBox" name="searchFieldComboBox"/>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>Comparison</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QComboBox" name="comparisonComboBox"/>
          </item>
         </layout>
        </item>
       </layout>
      </item>
+     <item row="1" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QComboBox" name="andOrComboBox">
+         <item>
+          <property name="text">
+           <string>AND</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>OR</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item row="2" column="0">
+      <widget class="QCheckBox" name="not2CheckBox">
+       <property name="text">
+        <string>NOT</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QLineEdit" name="findString2Edit"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_13">
+         <item>
+          <widget class="QComboBox" name="comparison2ComboBox">
+           <property name="currentIndex">
+            <number>1</number>
+           </property>
+           <item>
+            <property name="text">
+             <string>equals</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>contains</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>begins with</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>ends with</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="caseSensitive2CheckBox">
+           <property name="text">
+            <string>Case sensitive</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Search Layers</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QComboBox" name="layerListComboBox"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Search Fields</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QComboBox" name="searchFieldComboBox"/>
+     </item>
     </layout>
    </item>
    <item>
-    <widget class="QCheckBox" name="autoZoomCheckBox">
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="firstMatchCheckBox">
      <property name="text">
-      <string>Automatically zoom to selected features</string>
+      <string>Report one result per feature</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="twoStringMatchCheckBox">
+     <property name="text">
+      <string>Constrain two search strings to match within an attribute field rather than across attribute fields</string>
      </property>
      <property name="checked">
       <bool>false</bool>
      </property>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Action when selecting features below</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="zoomPanComboBox">
+       <item>
+        <property name="text">
+         <string>Do nothing</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Zoom to selected features</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Pan to selected features</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QTableWidget" name="resultsTable"/>
