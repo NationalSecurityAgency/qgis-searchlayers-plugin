@@ -7,6 +7,7 @@ from qgis.PyQt.QtCore import Qt, QThread
 
 from qgis.core import QgsVectorLayer, Qgis, QgsProject, QgsMapLayer
 from .searchWorker import Worker
+from .fuzzyWorker import FuzzyWorker
 
 
 FORM_CLASS, _ = loadUiType(os.path.join(
@@ -58,6 +59,24 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         if self.noSelection:
             # We do not want this event while data is being changed
             return
+        zoom_pan = self.zoomPanComboBox.currentIndex()
+        if self.searchSelectedCheckBox.isChecked():
+            if zoom_pan == 0:
+                return
+            # We are searching on selected features so we don't want to select them from the list.
+            selectedItems = self.resultsTable.selectedItems()
+            if len(selectedItems) == 0:
+                return
+            selectedRow = selectedItems[0].row()
+            foundid = self.resultsTable.item(selectedRow, 0).data(Qt.UserRole)
+            selectedLayer = self.results[foundid][0]
+            selectedFeature = self.results[foundid][1]
+            fid = selectedFeature.id()
+            if zoom_pan == 1:
+                self.canvas.zoomToFeatureIds(selectedLayer, [fid])
+            else:
+                self.canvas.panToFeatureIds(selectedLayer, [fid])
+            return
         # Deselect all selections
         layers = QgsProject.instance().mapLayers().values()
         for layer in layers:
@@ -73,7 +92,6 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
             selectedFeature = self.results[foundid][1]
             selectedLayer.select(selectedFeature.id())
         # Zoom to the selected feature
-        zoom_pan = self.zoomPanComboBox.currentIndex()
         if selectedLayer and zoom_pan:
             if zoom_pan == 1:
                 self.canvas.zoomToSelected(selectedLayer)
@@ -130,29 +148,13 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
 
     def runSearch(self):
         '''Called when the user pushes the Search button'''
-        selectedLayer = self.layerListComboBox.currentIndex()
-        comparisonMode = self.comparisonComboBox.currentIndex()
-        comparisonMode2 = self.comparison2ComboBox.currentIndex()
-        and_or = self.andOrComboBox.currentIndex()
-        case_sensitive = self.caseSensitiveCheckBox.isChecked()
-        case_sensitive2 = self.caseSensitive2CheckBox.isChecked()
-        self.two_string_match_single = self.twoStringMatchCheckBox.isChecked()
-        self.first_match_only = self.firstMatchCheckBox.isChecked()
+        # Set up general parametrs for all search methods
+        selected_tab = self.tabWidget.currentIndex()
         self.noSelection = True
-        try:
-            sstr = self.findStringEdit.text()
-            sstr2 = self.findString2Edit.text()
-        except:
-            self.showErrorMessage('Invalid Search String')
-            return
-            
-        if sstr == '':
-            self.showErrorMessage('Search string is empty')
-            return
-        if sstr2 == '':
-            self.is_single_string = True
-        else:
-            self.is_single_string = False
+        selectedLayer = self.layerListComboBox.currentIndex()
+        self.first_match_only = self.firstMatchCheckBox.isChecked()
+        self.search_selected = self.searchSelectedCheckBox.isChecked()
+        
         if selectedLayer == 0:
             # Include all vector layers
             layers = QgsProject.instance().mapLayers().values()
@@ -172,7 +174,6 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
             return
         
         # vlayers contains the layers that we will search in
-        self.initSearchResultsTable()
         self.searchButton.setEnabled(False)
         self.stopButton.setEnabled(True)
         self.doneButton.setEnabled(False)
@@ -183,15 +184,55 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
             selectedField = self.searchFieldComboBox.currentText()
         else:
             selectedField = None
-        not_search = self.notCheckBox.isChecked()
-        not_search2 = self.not2CheckBox.isChecked()
         
         # Because this could take a lot of time, set up a separate thread
         # for a worker function to do the searching.
         thread = QThread()
-        worker = Worker(self.vlayers, infield, sstr, comparisonMode, case_sensitive, not_search, 
-            and_or, sstr2, comparisonMode2, case_sensitive2, not_search2,
-            selectedField, self.maxResults, self.first_match_only, self.two_string_match_single)
+        if selected_tab == 0:
+            # Get parameters for regular search
+            comparisonMode = self.comparisonComboBox.currentIndex()
+            comparisonMode2 = self.comparison2ComboBox.currentIndex()
+            and_or = self.andOrComboBox.currentIndex()
+            case_sensitive = self.caseSensitiveCheckBox.isChecked()
+            case_sensitive2 = self.caseSensitive2CheckBox.isChecked()
+            self.two_string_match_single = self.twoStringMatchCheckBox.isChecked()
+            not_search = self.notCheckBox.isChecked()
+            not_search2 = self.not2CheckBox.isChecked()
+            
+            try:
+                sstr = self.findStringEdit.text()
+                sstr2 = self.findString2Edit.text()
+            except:
+                self.showErrorMessage('Invalid Search String')
+                return
+                
+            if sstr == '':
+                self.showErrorMessage('Search string is empty')
+                return
+            if sstr2 == '':
+                self.is_single_string = True
+            else:
+                self.is_single_string = False
+            self.initSearchResultsTable()
+            worker = Worker(self.vlayers, infield, sstr, comparisonMode, case_sensitive, not_search, 
+                and_or, sstr2, comparisonMode2, case_sensitive2, not_search2,
+                selectedField, self.maxResults, self.first_match_only, self.two_string_match_single,
+                self.search_selected)
+        else:
+            # Get Fuzzy parameters
+            if self.levenshteinButton.isChecked():
+                algorithm = 0
+            else:
+                algorithm = 1
+            sstr = self.fuzzyTextEdit.toPlainText()
+            case_sensitive = self.fuzzyCaseSensitiveCheckBox.isChecked()
+            fuzzy_contains = self.fuzzyContainsCheckBox.isChecked()
+            match_metric = self.levenshteinMatchSpinBox.value() / 100.0
+            self.is_single_string = True
+            self.initSearchResultsTable()
+            worker = FuzzyWorker(self.vlayers, infield, sstr, algorithm, case_sensitive,
+                fuzzy_contains, selectedField, self.maxResults, self.first_match_only,
+                self.search_selected, match_metric)
         worker.moveToThread(thread)
         thread.started.connect(worker.run)
         worker.finished.connect(self.workerFinished)

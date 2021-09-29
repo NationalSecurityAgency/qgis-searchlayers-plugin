@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>554</width>
-    <height>573</height>
+    <height>565</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,197 +15,354 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label_7">
-     <property name="text">
-      <string>Search criteria</string>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QFormLayout" name="formLayout_2">
-     <item row="0" column="0">
-      <widget class="QCheckBox" name="notCheckBox">
-       <property name="text">
-        <string>NOT</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <layout class="QVBoxLayout" name="verticalLayout_4">
+     <widget class="QWidget" name="tab1">
+      <attribute name="title">
+       <string>Search criteria</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QLineEdit" name="findStringEdit"/>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <widget class="QComboBox" name="comparisonComboBox">
-           <property name="currentIndex">
-            <number>1</number>
+        <layout class="QFormLayout" name="formLayout_2">
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="notCheckBox">
+           <property name="text">
+            <string>NOT        </string>
            </property>
-           <item>
-            <property name="text">
-             <string>equals</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>contains</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>begins with</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>ends with</string>
-            </property>
-           </item>
           </widget>
          </item>
-         <item>
-          <widget class="QCheckBox" name="caseSensitiveCheckBox">
+         <item row="0" column="1">
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <widget class="QLineEdit" name="findStringEdit"/>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QComboBox" name="comparisonComboBox">
+               <property name="currentIndex">
+                <number>1</number>
+               </property>
+               <item>
+                <property name="text">
+                 <string>equals</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>contains</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>begins with</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>ends with</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="caseSensitiveCheckBox">
+               <property name="text">
+                <string>Case sensitive</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QComboBox" name="andOrComboBox">
+             <item>
+              <property name="text">
+               <string>AND</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>OR</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="not2CheckBox">
            <property name="text">
-            <string>Case sensitive</string>
+            <string>NOT</string>
            </property>
           </widget>
+         </item>
+         <item row="2" column="1">
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QLineEdit" name="findString2Edit"/>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_13">
+             <item>
+              <widget class="QComboBox" name="comparison2ComboBox">
+               <property name="currentIndex">
+                <number>1</number>
+               </property>
+               <item>
+                <property name="text">
+                 <string>equals</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>contains</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>begins with</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>ends with</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="caseSensitive2CheckBox">
+               <property name="text">
+                <string>Case sensitive</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>
-      </layout>
-     </item>
-     <item row="1" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
-        <spacer name="horizontalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+        <widget class="QCheckBox" name="twoStringMatchCheckBox">
+         <property name="text">
+          <string>Constrain two search strings to match within an attribute field rather than across attribute fields</string>
          </property>
-         <property name="sizeHint" stdset="0">
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab2">
+      <attribute name="title">
+       <string>Fuzzy search</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QPlainTextEdit" name="fuzzyTextEdit">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
           <size>
-           <width>40</width>
-           <height>20</height>
+           <width>16777215</width>
+           <height>60</height>
           </size>
          </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QComboBox" name="andOrComboBox">
-         <item>
-          <property name="text">
-           <string>AND</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>OR</string>
-          </property>
-         </item>
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer_4">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </item>
-     <item row="2" column="0">
-      <widget class="QCheckBox" name="not2CheckBox">
-       <property name="text">
-        <string>NOT</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <layout class="QVBoxLayout" name="verticalLayout_5">
-       <item>
-        <widget class="QLineEdit" name="findString2Edit"/>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_13">
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
          <item>
-          <widget class="QComboBox" name="comparison2ComboBox">
-           <property name="currentIndex">
-            <number>1</number>
-           </property>
+          <layout class="QVBoxLayout" name="verticalLayout_8">
            <item>
-            <property name="text">
-             <string>equals</string>
-            </property>
+            <widget class="QLabel" name="label_5">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>Hints</string>
+             </property>
+            </widget>
            </item>
            <item>
-            <property name="text">
-             <string>contains</string>
-            </property>
+            <widget class="QCheckBox" name="fuzzyCaseSensitiveCheckBox">
+             <property name="text">
+              <string>Case sensitive</string>
+             </property>
+            </widget>
            </item>
            <item>
-            <property name="text">
-             <string>begins with</string>
-            </property>
+            <widget class="QCheckBox" name="fuzzyContainsCheckBox">
+             <property name="text">
+              <string>Contains</string>
+             </property>
+            </widget>
            </item>
            <item>
-            <property name="text">
-             <string>ends with</string>
-            </property>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
-          </widget>
+          </layout>
          </item>
          <item>
-          <widget class="QCheckBox" name="caseSensitive2CheckBox">
-           <property name="text">
-            <string>Case sensitive</string>
-           </property>
-          </widget>
+          <layout class="QVBoxLayout" name="verticalLayout_9">
+           <item>
+            <widget class="QLabel" name="label_4">
+             <property name="text">
+              <string>Algorithms</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QFormLayout" name="formLayout_5">
+             <item row="0" column="0">
+              <widget class="QRadioButton" name="levenshteinButton">
+               <property name="text">
+                <string>Levenshtein</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <layout class="QHBoxLayout" name="horizontalLayout_5">
+               <item>
+                <widget class="QSpinBox" name="levenshteinMatchSpinBox">
+                 <property name="suffix">
+                  <string/>
+                 </property>
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                 <property name="maximum">
+                  <number>100</number>
+                 </property>
+                 <property name="value">
+                  <number>80</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_6">
+                 <property name="text">
+                  <string>% match</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLabel" name="label_7">
+               <property name="text">
+                <string>Exact match - best used for single words</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QRadioButton" name="soundexButton">
+               <property name="text">
+                <string>Soundex</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>
       </layout>
-     </item>
-     <item row="3" column="0">
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <layout class="QFormLayout" name="formLayout_3">
+     <item row="0" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
         <string>Search Layers</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
-      <widget class="QComboBox" name="layerListComboBox"/>
-     </item>
-     <item row="4" column="0">
+     <item row="1" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
         <string>Search Fields</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
+     <item row="1" column="1">
       <widget class="QComboBox" name="searchFieldComboBox"/>
      </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="layerListComboBox"/>
+     </item>
     </layout>
-   </item>
-   <item>
-    <widget class="Line" name="line_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
    </item>
    <item>
     <widget class="QCheckBox" name="firstMatchCheckBox">
@@ -218,12 +375,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="twoStringMatchCheckBox">
+    <widget class="QCheckBox" name="searchSelectedCheckBox">
      <property name="text">
-      <string>Constrain two search strings to match within an attribute field rather than across attribute fields</string>
-     </property>
-     <property name="checked">
-      <bool>false</bool>
+      <string>Only search selected features (Disables results selection)</string>
      </property>
     </widget>
    </item>

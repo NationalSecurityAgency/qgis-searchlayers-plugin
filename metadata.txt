@@ -2,19 +2,20 @@
 name=Search Layers
 qgisMinimumVersion=3.0
 description=Enhanced textual searching on all QGIS layers and fields.
-version=3.0.3
+version=3.0.4
 author=C Hamilton
 email=adenaculture@gmail.com
 about=The Search Layers plugin features enhanced textual vector layer searching in QGIS. This plugin can search across all layers and all fields.
 tracker=https://github.com/NationalSecurityAgency/qgis-searchlayers-plugin
 repository=https://github.com/NationalSecurityAgency/qgis-searchlayers-plugin
 homepage=https://github.com/NationalSecurityAgency/qgis-searchlayers-plugin
-tags=search,find,textual search
+tags=search,find,textual search, fuzzy, levenshtein, soundex
 category=Plugins
 icon=icon.png
 experimental=False
 deprecated=False
 changelog=
+    3.0.4 - Search on selected features, added fuzzy search
     3.0.3 - Add second search string with AND, OR, and NOT operators
     3.0.2 - Highlight a range of features, add check box to automatically zoom to selected
     3.0.1 - Added Feature Id in the result table.
