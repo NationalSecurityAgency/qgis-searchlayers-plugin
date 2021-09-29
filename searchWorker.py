@@ -15,7 +15,7 @@ class Worker(QObject):
     
     def __init__(self, vlayers, infield, searchStr, comparisonMode, case_sensitive, not_search,
             and_or, searchStr2, comparisonMode2, case_sensitive2, not_search2, selectedField, maxResults,
-            first_match_only, two_string_match_single):
+            first_match_only, two_string_match_single, search_selected):
         QObject.__init__(self)
         self.vlayers = vlayers
         self.infield = infield
@@ -33,6 +33,7 @@ class Worker(QObject):
         self.maxResults = maxResults
         self.first_match_only = first_match_only
         self.two_string_match_single = two_string_match_single
+        self.search_selected = search_selected
         
     def run(self):
         '''Worker Run routine'''
@@ -65,7 +66,12 @@ class Worker(QObject):
         for field in layer.fields():
             fnames.append(field.name())
         # Get an iterator for all the features in the vector
-        iter = layer.getFeatures(QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry))
+        if self.search_selected:
+            if layer.selectedFeatureCount() == 0:
+                return
+            iter = layer.getSelectedFeatures(QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry))
+        else:
+            iter = layer.getFeatures(QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry))
         if self.case_sensitive:
             flags1 = re.UNICODE
         else:
@@ -245,8 +251,11 @@ class Worker(QObject):
         request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
         request.setSubsetOfAttributes([selectedField], layer.fields())
         request.setFilterExpression(fstring)
-
-        for feature in layer.getFeatures(request):
+        if self.search_selected:
+            iter = layer.getSelectedFeatures(request)
+        else:
+            iter = layer.getFeatures(request)
+        for feature in iter:
             # Check to see if it has been aborted
             if self.killed is True:
                 return
