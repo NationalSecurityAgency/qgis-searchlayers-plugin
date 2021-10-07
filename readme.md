@@ -1,10 +1,10 @@
 # Search Layers Plugin
 
-The Search Layers plugin features enhanced textual vector layer searching in QGIS. It provides the ability to search across all layers and all fields.
+The Search Layers plugin features enhanced textual vector layer searching in QGIS. It provides the ability to search across all layers and all fields. It also features a new Fuzzy Search algorithm.
 
 Search Layers is located in the QGIS Plugins menu under *"Plugins->Search Layers->Search Layers"* or by selecting the tool bar icon. ![Toolbar Icon](icon.png)
 
-The following dialog box is displayed when "Search Layers" is launched.
+The following dialog box is displayed when "Search Layers" is first launched.
 
 ![Search Layers Dialog](doc/layersearch.jpg)
 
@@ -25,6 +25,8 @@ It is possible that a search string could match the contents in one or more attr
 
 When two search strings are used checking **Constrain two search strings to match within an attribute field rather than across attribute fields** will constrain the search criteria to match within an attribute field; otherwise, one string may match one attribute field and the other string may match another attribute field. The results are either **AND**ed or **OR**ed together. Here is an axample of a two string search.
 
+If **Only search selected features** is checked, the features that are selected in QGIS will be the only ones searched. This is one way to limit a search to a particular area. Note that with this checked, the normal interaction of clicking on a found feature in the list will not select the feature for obvious reasons; however, the zoom or pan to actions will still apply.
+
 ![Search Layers Dialog](doc/layersearch2.jpg)
 
 Click  the **Search** button to begin the search. In the case of a large data set, clicking on **Abort** will halt the process. Note that the plugin stops after finding 1500 matches.
@@ -36,3 +38,9 @@ When matches are found and clicked on the feature(s) will be highlighted. You ca
 * **Pan to selected features** - QGIS will pan to the selected features.
 
 Note that the search is very quick when selecting a single vector layer under **Search Layers** and a single field under **Search Fields**. If this is not the case regular expression searches are used and are very slow. In the future this may change.
+
+## Fuzzy Search
+
+This QGIS plugin makes use of two fuzzy search algorithms. One is based off of the ***Levenshtein*** algorithm and the other is a ***Soundex*** algorithm. The soundex is really only useful for matching single words that sound the same. This is a screen shot.
+
+![Search Layers Dialog](doc/layersearch3.jpg)
