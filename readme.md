@@ -27,6 +27,8 @@ When two search strings are used checking **Constrain two search strings to matc
 
 If **Only search selected features** is checked, the features that are selected in QGIS will be the only ones searched. This is one way to limit a search to a particular area. Note that with this checked, the normal interaction of clicking on a found feature in the list will not select the feature for obvious reasons; however, the zoom or pan to actions will still apply.
 
+If search results are found, then the **"Results -> Layers"** button will be enabled. Clicking on this button will export all the found results into new virtual layers. It is advised to install the ***Memory Saver Plugin*** to prevent these layers from disappearing after closing the project.
+
 ![Search Layers Dialog](doc/layersearch2.jpg)
 
 Click  the **Search** button to begin the search. In the case of a large data set, clicking on **Abort** will halt the process. Note that the plugin stops after finding 1500 matches.

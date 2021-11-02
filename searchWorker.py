@@ -69,9 +69,11 @@ class Worker(QObject):
         if self.search_selected:
             if layer.selectedFeatureCount() == 0:
                 return
-            iter = layer.getSelectedFeatures(QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry))
+            # iter = layer.getSelectedFeatures(QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry))
+            iter = layer.getSelectedFeatures()
         else:
-            iter = layer.getFeatures(QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry))
+            # iter = layer.getFeatures(QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry))
+            iter = layer.getFeatures()
         if self.case_sensitive:
             flags1 = re.UNICODE
         else:
@@ -248,7 +250,8 @@ class Worker(QObject):
             else:
                 fstring = '{} OR {}'.format(fstring, fstring2)
 
-        request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
+        # request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
+        request = QgsFeatureRequest()
         request.setSubsetOfAttributes([selectedField], layer.fields())
         request.setFilterExpression(fstring)
         if self.search_selected:

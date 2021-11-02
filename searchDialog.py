@@ -1,11 +1,12 @@
 import os
 import re
+import time
 
 from qgis.PyQt.uic import loadUiType
 from qgis.PyQt.QtWidgets import QDialog, QAbstractItemView, QTableWidget, QTableWidgetItem
 from qgis.PyQt.QtCore import Qt, QThread
 
-from qgis.core import QgsVectorLayer, Qgis, QgsProject, QgsMapLayer
+from qgis.core import QgsVectorLayer, Qgis, QgsProject, QgsWkbTypes, QgsMapLayer, QgsFields
 from .searchWorker import Worker
 from .fuzzyWorker import FuzzyWorker
 
@@ -29,6 +30,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.stopButton.clicked.connect(self.killWorker)
         self.searchButton.clicked.connect(self.runSearch)
         self.clearButton.clicked.connect(self.clearResults)
+        self.results2LayersButton.clicked.connect(self.exportResults)
         self.layerListComboBox.activated.connect(self.layerSelected)
         self.searchFieldComboBox.addItems(['<All Fields>'])
         self.maxResults = 1500
@@ -38,7 +40,11 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.resultsTable.setHorizontalHeaderLabels(['Layer','Feature ID','Field','Search Results'])
         self.resultsTable.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.resultsTable.itemSelectionChanged.connect(self.select_feature)
+        self.results = []
+        self.ignore_clear = False
         self.worker = None
+        self.time_start = 0
+        self.last_search_str = ''
 
     def closeDialog(self):
         '''Close the dialog box when the Close button is pushed'''
@@ -49,7 +55,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         It forces the dialog to reload.'''
         # Stop any existing search
         self.killWorker()
-        if self.isVisible():
+        if self.isVisible() or len(self.results) != 0:
             self.populateLayerListComboBox()
             self.clearResults()
 
@@ -178,6 +184,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.stopButton.setEnabled(True)
         self.doneButton.setEnabled(False)
         self.clearButton.setEnabled(False)
+        self.results2LayersButton.setEnabled(False)
         self.resultsLabel.setText('')
         infield = self.searchFieldComboBox.currentIndex() >= 1
         if infield is True:
@@ -187,6 +194,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         
         # Because this could take a lot of time, set up a separate thread
         # for a worker function to do the searching.
+        self.time_start = time.perf_counter()
         thread = QThread()
         if selected_tab == 0:
             # Get parameters for regular search
@@ -201,6 +209,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
             
             try:
                 sstr = self.findStringEdit.text()
+                self.last_search_str = sstr
                 sstr2 = self.findString2Edit.text()
             except:
                 self.showErrorMessage('Invalid Search String')
@@ -250,17 +259,22 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.thread.wait()
         self.thread.deleteLater()
         self.worker = None
-        self.resultsLabel.setText('Results: '+str(self.found))
+        total_time = time.perf_counter() - self.time_start
+        self.resultsLabel.setText('Results: {} in {:.1f}s'.format(self.found, total_time))
 
         self.vlayers = []
         self.searchButton.setEnabled(True)
         self.clearButton.setEnabled(True)
         self.stopButton.setEnabled(False)
         self.doneButton.setEnabled(True)
+        if len(self.results):
+            self.results2LayersButton.setEnabled(True)
+        else:
+            self.results2LayersButton.setEnabled(False)
     
     def workerError(self, exception_string):
         '''An error occurred so display it.'''
-        #self.showErrorMessage(exception_string)
+        # self.showErrorMessage(exception_string)
         print(exception_string)
     
     def killWorker(self):
@@ -271,11 +285,15 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         
     def clearResults(self):
         '''Clear all the search results.'''
+        if self.ignore_clear:
+            return
         self.noSelection = True
         self.found = 0
         self.results = []
+        self.layer_set = set()
         self.resultsTable.setRowCount(0)        
         self.noSelection = False
+        self.results2LayersButton.setEnabled(False)
     
     def addFoundItem(self, layer, feature, attrname1, results1, attrname2, results2):
         '''We found an item so add it to the found list.'''
@@ -283,6 +301,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.resultsTable.setSortingEnabled(False)
         self.resultsTable.insertRow(self.found)
         self.results.append([layer, feature])
+        self.layer_set.add(layer)
         # Save the search found position in the first element of the table. This way
         # we can allow the user to sort the table, but be able to know which entry it is.
         item = QTableWidgetItem(layer.name())
@@ -300,7 +319,44 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.found += 1   
         # Restore sorting
         self.resultsTable.setSortingEnabled(True)
+    
+    def exportResults(self):
+        # No found results, no export
+        if len(self.results) == 0:
+            return
+        self.resultsTable.setDisabled(True)
+        self.ignore_clear = True
+        layer_map = self.createExportedLayers()
+        for layer, feature in self.results:
+            # print('{} {}'.format(layer, feature))
+            layer_map[layer].dataProvider().addFeatures([feature])
             
+        self.ignore_clear = True
+        for layer in layer_map:
+            new_layer = layer_map[layer]
+            new_layer.updateExtents()
+            QgsProject.instance().addMapLayer(new_layer)
+        self.ignore_clear = False
+        self.resultsTable.setDisabled(False)
+    
+    def createExportedLayers(self):
+        if len(self.last_search_str) > 20:
+            sname = self.last_search_str[0:17]+'...'
+        else:
+            sname = self.last_search_str
+        layer_mapping = {}
+        for layer in self.layer_set:
+            new_name = layer.name() + ' ('+sname+')'
+            wkb_type = layer.wkbType()
+            layer_crs = layer.sourceCrs()
+            fields = QgsFields(layer.fields())
+            new_layer = QgsVectorLayer("{}?crs={}".format(QgsWkbTypes.displayString(wkb_type), layer_crs.authid()), new_name, "memory")
+            dp = new_layer.dataProvider()
+            dp.addAttributes(fields)
+            new_layer.updateFields()
+            layer_mapping[layer] = new_layer
+        return(layer_mapping)
+                
     def showErrorMessage(self, message):
         '''Display an error message.'''
         self.iface.messageBar().pushMessage("", message, level=Qgis.Warning, duration=2)
