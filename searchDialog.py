@@ -1,6 +1,7 @@
 import os
 import re
 import time
+import datetime
 
 from qgis.PyQt.uic import loadUiType
 from qgis.PyQt.QtWidgets import QDialog, QAbstractItemView, QTableWidget, QTableWidgetItem
@@ -45,6 +46,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.worker = None
         self.time_start = 0
         self.last_search_str = ''
+        self.last_search_str2 = ''
 
     def closeDialog(self):
         '''Close the dialog box when the Close button is pushed'''
@@ -123,7 +125,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         layers = QgsProject.instance().mapLayers().values()
 
         for layer in layers:
-            if layer.type() == QgsMapLayer.VectorLayer:
+            if layer.type() == QgsMapLayer.VectorLayer and not layer.sourceName().startswith('__'):
                 layerlist.append(layer.name())
                 self.searchLayers.append(layer)
 
@@ -173,7 +175,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.vlayers=[]
         # Find the vector layers that are to be searched
         for layer in layers:
-            if isinstance(layer, QgsVectorLayer):
+            if isinstance(layer, QgsVectorLayer) and not layer.sourceName().startswith('__'):
                 self.vlayers.append(layer)
         if len(self.vlayers) == 0:
             self.showErrorMessage('There are no vector layers to search through')
@@ -211,6 +213,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
                 sstr = self.findStringEdit.text()
                 self.last_search_str = sstr
                 sstr2 = self.findString2Edit.text()
+                self.last_search_str2 = sstr2
             except:
                 self.showErrorMessage('Invalid Search String')
                 return
@@ -331,22 +334,35 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
             # print('{} {}'.format(layer, feature))
             layer_map[layer].dataProvider().addFeatures([feature])
             
-        self.ignore_clear = True
-        for layer in layer_map:
-            new_layer = layer_map[layer]
-            new_layer.updateExtents()
-            QgsProject.instance().addMapLayer(new_layer)
-        self.ignore_clear = False
-        self.resultsTable.setDisabled(False)
-    
-    def createExportedLayers(self):
+        dt = datetime.datetime.now()
+        dt_name = dt.strftime('%Y-%m-%d %H:%M:%S')
         if len(self.last_search_str) > 20:
             sname = self.last_search_str[0:17]+'...'
         else:
             sname = self.last_search_str
+        if len(self.last_search_str2) > 20:
+            sname2 = self.last_search_str2[0:17]+'...'
+        else:
+            sname2 = self.last_search_str2
+        if sname2.strip() == '':
+            fname = '{}_{}'.format(dt_name, sname)
+        else:
+            fname = '{}_{}_{}'.format(dt_name, sname, sname2)
+        self.ignore_clear = True
+        layer_tree = QgsProject.instance().layerTreeRoot()
+        group = layer_tree.insertGroup(0, fname)
+        for layer in layer_map:
+            new_layer = layer_map[layer]
+            new_layer.updateExtents()
+            QgsProject.instance().addMapLayer(new_layer, False)
+            group.addLayer(new_layer)
+        self.ignore_clear = False
+        self.resultsTable.setDisabled(False)
+    
+    def createExportedLayers(self):
         layer_mapping = {}
         for layer in self.layer_set:
-            new_name = layer.name() + ' ('+sname+')'
+            new_name = '__'+layer.name()
             wkb_type = layer.wkbType()
             layer_crs = layer.sourceCrs()
             fields = QgsFields(layer.fields())

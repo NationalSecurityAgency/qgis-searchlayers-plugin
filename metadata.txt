@@ -15,7 +15,7 @@ icon=icon.png
 experimental=False
 deprecated=False
 changelog=
-    3.0.5 - Allow matched features to be exported to new layrs.
+    3.0.5 - Allow matched features to be exported to new layers.
     3.0.4 - Search on selected features, added fuzzy search
     3.0.3 - Add second search string with AND, OR, and NOT operators
     3.0.2 - Highlight a range of features, add check box to automatically zoom to selected
