@@ -3,7 +3,7 @@ import re
 
 from qgis.PyQt.QtCore import QObject, pyqtSignal
 
-from qgis.core import QgsVectorLayer, QgsFeatureRequest, QgsStringUtils
+from qgis.core import QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsProject, QgsVectorLayer, QgsFeatureRequest, QgsStringUtils
 import traceback
 
 class FuzzyWorker(QObject):
@@ -13,10 +13,11 @@ class FuzzyWorker(QObject):
     error = pyqtSignal(str)
     foundmatch = pyqtSignal(QgsVectorLayer, object, object, str, object, str)
     
-    def __init__(self, vlayers, infield, searchStr, algorithm, case_sensitive,
+    def __init__(self, canvas, vlayers, infield, searchStr, algorithm, case_sensitive,
             fuzzy_contains, selectedField, maxResults, first_match_only,
-            search_selected, match_metric):
+            search_selected, match_metric, constrain_to_canvas):
         QObject.__init__(self)
+        self.canvas = canvas
         self.vlayers = vlayers
         self.infield = infield
         self.searchStr = searchStr
@@ -29,6 +30,8 @@ class FuzzyWorker(QObject):
         self.search_selected = search_selected
         self.fuzzy_contains = fuzzy_contains
         self.match_metric = match_metric
+        self.constrain_to_canvas = constrain_to_canvas
+        self.epsg4326 = QgsCoordinateReferenceSystem('EPSG:4326')
         
     def run(self):
         '''Worker Run routine'''
@@ -51,11 +54,30 @@ class FuzzyWorker(QObject):
         '''Set a flag that we want to stop looking for matches.'''
         self.killed = True
         
+    def canvasExtent(self, layer):
+        canvas_crs = self.canvas.mapSettings().destinationCrs()
+        # We need to make sure the canvas extent is within its CRS bounds
+        extent = self.canvas.extent() # This is returned as EPSG:4326
+        epsg4326_to_canvas = QgsCoordinateTransform(self.epsg4326, canvas_crs, QgsProject.instance())
+        legal_bounds = epsg4326_to_canvas.transform(canvas_crs.bounds())
+        extent = legal_bounds.intersect(extent)
+        
+        # transform the extent to the layer's crs
+        layer_crs = layer.crs()
+        trans = QgsCoordinateTransform(canvas_crs, layer_crs, QgsProject.instance())
+        textent = trans.transform(extent)
+        return(textent)
+        
     def searchLayer(self, layer):
         '''Do a string search across all columns in a table'''
         if self.killed:
             return
-        error_found = False
+        # Check for contraints
+        if self.constrain_to_canvas and layer.isSpatial():
+            extent = self.canvasExtent(layer)
+            request = QgsFeatureRequest(extent).setFlags(QgsFeatureRequest.NoGeometry)
+        else:
+            request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
         fnames = []
         # Get and Keep a copy of the field names
         for field in layer.fields():
@@ -64,9 +86,9 @@ class FuzzyWorker(QObject):
         if self.search_selected:
             if layer.selectedFeatureCount() == 0:
                 return
-            iter = layer.getSelectedFeatures(QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry))
+            iter = layer.getSelectedFeatures(request)
         else:
-            iter = layer.getFeatures(QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry))
+            iter = layer.getFeatures(request)
         search_str_len = len(self.searchStr)
         '''self.error.emit('algorithm: {}'.format(self.algorithm))
         self.error.emit('searchStr: {}'.format(self.searchStr))
@@ -124,9 +146,13 @@ class FuzzyWorker(QObject):
         '''Do a string search on a specific column in the table.'''
         if self.killed:
             return
-        # self.error.emit('searchFieldInLayer')
         search_str_len = len(self.searchStr)
-        request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
+        if self.constrain_to_canvas and layer.isSpatial():
+            extent = self.canvasExtent(layer)
+            request = QgsFeatureRequest(extent).setFlags(QgsFeatureRequest.NoGeometry)
+        else:
+            request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
+        # self.error.emit('searchFieldInLayer')
         request.setSubsetOfAttributes([selectedField], layer.fields())
         if self.search_selected:
             iter = layer.getSelectedFeatures(request)

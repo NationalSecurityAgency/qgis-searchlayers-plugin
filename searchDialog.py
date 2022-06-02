@@ -5,11 +5,14 @@ import datetime
 
 from qgis.PyQt.uic import loadUiType
 from qgis.PyQt.QtWidgets import QDialog, QAbstractItemView, QTableWidget, QTableWidgetItem
-from qgis.PyQt.QtCore import Qt, QThread
+from qgis.PyQt.QtCore import Qt, QThread, QEvent, QCoreApplication
 
 from qgis.core import QgsVectorLayer, Qgis, QgsProject, QgsWkbTypes, QgsMapLayer, QgsFields
 from .searchWorker import Worker
 from .fuzzyWorker import FuzzyWorker
+
+def tr(string):
+    return QCoreApplication.translate('@default', string)
 
 
 FORM_CLASS, _ = loadUiType(os.path.join(
@@ -17,6 +20,7 @@ FORM_CLASS, _ = loadUiType(os.path.join(
 
 
 class LayerSearchDialog(QDialog, FORM_CLASS):
+    button_pressed = 1
     def __init__(self, iface, parent):
         '''Initialize the LayerSearch dialog box'''
         super(LayerSearchDialog, self).__init__(parent)
@@ -33,14 +37,15 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.clearButton.clicked.connect(self.clearResults)
         self.results2LayersButton.clicked.connect(self.exportResults)
         self.layerListComboBox.activated.connect(self.layerSelected)
-        self.searchFieldComboBox.addItems(['<All Fields>'])
-        self.maxResults = 1500
+        self.searchFieldComboBox.addItems([tr('<All Fields>')])
+        self.maxResults = 2000
         self.resultsTable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.resultsTable.setColumnCount(4)
         self.resultsTable.setSortingEnabled(True)
-        self.resultsTable.setHorizontalHeaderLabels(['Layer','Feature ID','Field','Search Results'])
+        self.resultsTable.setHorizontalHeaderLabels([tr('Layer'),tr('Feature ID'),tr('Field'),tr('Search Results')])
         self.resultsTable.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.resultsTable.itemSelectionChanged.connect(self.select_feature)
+        # self.resultsTable.viewport().installEventFilter(self)
         self.results = []
         self.ignore_clear = False
         self.worker = None
@@ -51,6 +56,11 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
     def closeDialog(self):
         '''Close the dialog box when the Close button is pushed'''
         self.hide()
+    
+    def eventFilter(self, source, e):
+        if e.type() == QEvent.MouseButtonPress:
+            self.button_pressed = e.button()
+        return super().eventFilter(source, e)
 
     def updateLayers(self):
         '''Called when a layer has been added or deleted in QGIS.
@@ -120,8 +130,8 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         '''Find all the vector layers and add them to the layer list
         that the user can select. In addition the user can search on all
         layers or all selected layers.'''
-        layerlist = ['<All Layers>','<Selected Layers>']
-        self.searchLayers = [None, None] # This is same size as layerlist
+        layerlist = ['<All Layers>','<Selected Layers>','<Visible Layers>']
+        self.searchLayers = [None, None, None] # This is same size as layerlist
         layers = QgsProject.instance().mapLayers().values()
 
         for layer in layers:
@@ -137,7 +147,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         selectedLayer = self.layerListComboBox.currentIndex()
         self.searchFieldComboBox.clear()
         self.searchFieldComboBox.addItem('<All Fields>')
-        if selectedLayer > 1:
+        if selectedLayer > 2:
             self.searchFieldComboBox.setEnabled(True)
             for field in self.searchLayers[selectedLayer].fields():
                 self.searchFieldComboBox.addItem(field.name())
@@ -149,10 +159,27 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.clearResults()
         if self.is_single_string or self.two_string_match_single:
             self.resultsTable.setColumnCount(4)
-            self.resultsTable.setHorizontalHeaderLabels(['Layer','Feature ID','Field','Results'])
+            self.resultsTable.setHorizontalHeaderLabels([tr('Layer'),tr('Feature ID'),tr('Field'),tr('Results')])
         else:
             self.resultsTable.setColumnCount(6)
-            self.resultsTable.setHorizontalHeaderLabels(['Layer','Feature ID','Field 1','Results 1','Field 2','Results 2'])
+            self.resultsTable.setHorizontalHeaderLabels([tr('Layer'),tr('Feature ID'),tr('Field 1'),tr('Results 1'),tr('Field 2'),tr('Results 2')])
+
+    def setButtons(self, searching):
+        if searching:
+            self.searchButton.setEnabled(False)
+            self.stopButton.setEnabled(True)
+            self.doneButton.setEnabled(False)
+            self.clearButton.setEnabled(False)
+            self.results2LayersButton.setEnabled(False)
+        else:
+            self.searchButton.setEnabled(True)
+            self.clearButton.setEnabled(True)
+            self.stopButton.setEnabled(False)
+            self.doneButton.setEnabled(True)
+            if len(self.results):
+                self.results2LayersButton.setEnabled(True)
+            else:
+                self.results2LayersButton.setEnabled(False)
 
     def runSearch(self):
         '''Called when the user pushes the Search button'''
@@ -162,6 +189,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         selectedLayer = self.layerListComboBox.currentIndex()
         self.first_match_only = self.firstMatchCheckBox.isChecked()
         self.search_selected = self.searchSelectedCheckBox.isChecked()
+        constrain_to_canvas = self.cannvasConstraintCheckBox.isChecked()
         
         if selectedLayer == 0:
             # Include all vector layers
@@ -169,6 +197,13 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         elif selectedLayer == 1:
             # Include all selected vector layers
             layers = self.iface.layerTreeView().selectedLayers()
+        elif selectedLayer == 2:
+            # This is for visiable layers and content
+            layer_trees = QgsProject.instance().layerTreeRoot().findLayers()
+            layers = []
+            for lt in layer_trees:
+                if lt.isVisible():
+                    layers.append(lt.layer())
         else:
             # Only search on the selected vector layer
             layers = [self.searchLayers[selectedLayer]]
@@ -178,15 +213,11 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
             if isinstance(layer, QgsVectorLayer) and not layer.sourceName().startswith('__'):
                 self.vlayers.append(layer)
         if len(self.vlayers) == 0:
-            self.showErrorMessage('There are no vector layers to search through')
+            self.showErrorMessage('There are no vector layers to search')
             return
         
         # vlayers contains the layers that we will search in
-        self.searchButton.setEnabled(False)
-        self.stopButton.setEnabled(True)
-        self.doneButton.setEnabled(False)
-        self.clearButton.setEnabled(False)
-        self.results2LayersButton.setEnabled(False)
+        self.setButtons(True)
         self.resultsLabel.setText('')
         infield = self.searchFieldComboBox.currentIndex() >= 1
         if infield is True:
@@ -215,21 +246,23 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
                 sstr2 = self.findString2Edit.text()
                 self.last_search_str2 = sstr2
             except:
-                self.showErrorMessage('Invalid Search String')
+                self.showErrorMessage(tr('Invalid Search String'))
+                self.setButtons(False)
                 return
                 
             if sstr == '':
-                self.showErrorMessage('Search string is empty')
+                self.showErrorMessage(tr('Search string is empty'))
+                self.setButtons(False)
                 return
             if sstr2 == '':
                 self.is_single_string = True
             else:
                 self.is_single_string = False
             self.initSearchResultsTable()
-            worker = Worker(self.vlayers, infield, sstr, comparisonMode, case_sensitive, not_search, 
+            worker = Worker(self.canvas, self.vlayers, infield, sstr, comparisonMode, case_sensitive, not_search, 
                 and_or, sstr2, comparisonMode2, case_sensitive2, not_search2,
                 selectedField, self.maxResults, self.first_match_only, self.two_string_match_single,
-                self.search_selected)
+                self.search_selected, constrain_to_canvas)
         else:
             # Get Fuzzy parameters
             if self.levenshteinButton.isChecked():
@@ -242,9 +275,9 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
             match_metric = self.levenshteinMatchSpinBox.value() / 100.0
             self.is_single_string = True
             self.initSearchResultsTable()
-            worker = FuzzyWorker(self.vlayers, infield, sstr, algorithm, case_sensitive,
+            worker = FuzzyWorker(self.canvas, self.vlayers, infield, sstr, algorithm, case_sensitive,
                 fuzzy_contains, selectedField, self.maxResults, self.first_match_only,
-                self.search_selected, match_metric)
+                self.search_selected, match_metric, constrain_to_canvas)
         worker.moveToThread(thread)
         thread.started.connect(worker.run)
         worker.finished.connect(self.workerFinished)
@@ -263,17 +296,10 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.thread.deleteLater()
         self.worker = None
         total_time = time.perf_counter() - self.time_start
-        self.resultsLabel.setText('Results: {} in {:.1f}s'.format(self.found, total_time))
+        self.resultsLabel.setText(tr('Results')+': {} in {:.1f}s'.format(self.found, total_time))
 
         self.vlayers = []
-        self.searchButton.setEnabled(True)
-        self.clearButton.setEnabled(True)
-        self.stopButton.setEnabled(False)
-        self.doneButton.setEnabled(True)
-        if len(self.results):
-            self.results2LayersButton.setEnabled(True)
-        else:
-            self.results2LayersButton.setEnabled(False)
+        self.setButtons(False)
     
     def workerError(self, exception_string):
         '''An error occurred so display it.'''

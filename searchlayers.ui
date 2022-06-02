@@ -365,14 +365,25 @@
     </layout>
    </item>
    <item>
-    <widget class="QCheckBox" name="firstMatchCheckBox">
-     <property name="text">
-      <string>Report one result per feature</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <item>
+      <widget class="QCheckBox" name="cannvasConstraintCheckBox">
+       <property name="text">
+        <string>Constrain search to canvas extent</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="firstMatchCheckBox">
+       <property name="text">
+        <string>Report one result per feature</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QCheckBox" name="searchSelectedCheckBox">
@@ -386,7 +397,7 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Action when selecting features below</string>
+        <string>Zoom action when selecting features below</string>
        </property>
       </widget>
      </item>
