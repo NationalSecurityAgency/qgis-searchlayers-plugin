@@ -1,6 +1,6 @@
 # Search Layers Plugin
 
-The Search Layers plugin features enhanced textual vector layer searching in QGIS. It provides the ability to search across all layers and all fields. It also features a new Fuzzy Search algorithm.
+The Search Layers plugin features enhanced textual vector layer searching in QGIS. It provides the ability to search across all layers and all fields. It also features a Fuzzy Search algorithm.
 
 Search Layers is located in the QGIS Plugins menu under *"Plugins->Search Layers->Search Layers"* or by selecting the tool bar icon. ![Toolbar Icon](icon.png)
 
@@ -8,6 +8,7 @@ The following dialog box is displayed when "Search Layers" is first launched.
 
 ![Search Layers Dialog](doc/layersearch.jpg)
 
+## Search criteria options
 Under **Search criteria**, you can enter up to two search strings. The **NOT** check box will negate the search results for the applicable string.
 
 Under each search string text box a drop down menu specifies how the search string is to match the contents in the attribute table. The options are: 
@@ -17,31 +18,42 @@ Under each search string text box a drop down menu specifies how the search stri
 * **begins with** - This search finds any field that begins with the search string.
 * **ends with** - This search finds any field that ends with the search string.
 
-By default the search is case independent, but by checking the **Case sensitive** check box the search string must match the case of the text.
+**Case sensitive** - When checked the search string must match that of the attribute text case. by default it is unchecked and does a case independent search.
 
-**Search Layers** specifies whether the search will be on *&lt;All Layers&gt;*, *&lt;Selected layers&gt;*, or on any of the vector layers in the QGIS project. If a specific layer is selected then **Search Fields** will be enabled and by default *&lt;All Fields&gt;* will be selected, but any field can be selected from the layer and the search will only search on that layer and field.
-
-It is possible that a search string could match the contents in one or more attribute fields. By checking **Report one result per feature**, only the first match per feature will be reported.
-
-When two search strings are used checking **Constrain two search strings to match within an attribute field rather than across attribute fields** will constrain the search criteria to match within an attribute field; otherwise, one string may match one attribute field and the other string may match another attribute field. The results are either **AND**ed or **OR**ed together. Here is an axample of a two string search.
-
-If **Only search selected features** is checked, the features that are selected in QGIS will be the only ones searched. This is one way to limit a search to a particular area. Note that with this checked, the normal interaction of clicking on a found feature in the list will not select the feature for obvious reasons; however, the zoom or pan to actions will still apply.
-
-If search results are found, then the **"Results -> Layers"** button will be enabled. Clicking on this button will export all the found results into new virtual layers. It is advised to install the ***Memory Saver Plugin*** to prevent these layers from disappearing after closing the project.
+**Constrain two search strings to match within an attribute field rather than across attribute fields** - This will constrain the search criteria when two search strings are used to match within an attribute field; otherwise, one string may match one attribute field and the other string may match another attribute field. The results are either **AND**ed or **OR**ed together. Here is an example of a two string search.
 
 ![Search Layers Dialog](doc/layersearch2.jpg)
 
-Click  the **Search** button to begin the search. In the case of a large data set, clicking on **Abort** will halt the process. Note that the plugin stops after finding 1500 matches.
+## Additional options
 
-When matches are found and clicked on the feature(s) will be highlighted. You can you Shift->Click to highlight a range of features, Ctrl->Click to toggle whether a feature is highlighted or not. The drop down menu **Action when selecting features below** controls one of the following motion actions. 
+**Search Layers** specifies what layers will be in the search.
+
+* *&lt;All Layers&gt;* - All vector layers will be searched whether they are visible or not.
+* *&lt;Selected layers&gt;* - All the selected layers in the Layers panel will be searched wither they are visible or not.
+* *&lt;Visible layers&gt;* - All visible layers will be searched.
+* *A specific layer* - Any of the vector layers in the QGIS project can be selected. When one is selected, then **Search Fields** will be enabled and by default *&lt;All Fields&gt;* will be displayed, but any field can be chosen from the layer and the search will only search on that layer and field.
+
+**Constrain search to canvas extent** - Checking this box will constrain the search to look for features that are within the current canvas window view. If you are only interested in the features in the canvas view, this will greatly speed up the search.
+
+**Report one result per feature** - It is possible that a search string could match the contents in one or more attribute fields. By checking this, only the first match per feature will be reported.
+
+**Only search selected features** - When checked, the features that are selected in QGIS will be the only ones searched. This is one way to limit a search to a particular area. Note that with this checked, the normal interaction of clicking on a found feature in the list will not select the feature for obvious reasons; however, the zoom or pan to actions will still apply.
+
+**Zoom action when selecting features below** - When matches are found and are clicked on this affects that action that takes place.
 
 * **Do nothing** - No action takes place.
 * **Zoom to selected features** - QGIS will zoom in on the selected features.
 * **Pan to selected features** - QGIS will pan to the selected features.
 
-Note that the search is very quick when selecting a single vector layer under **Search Layers** and a single field under **Search Fields**. If this is not the case regular expression searches are used and are very slow. In the future this may change.
+The selected feature(s) will be highlighted unless **Only search selected features** has been checked. Shift->Click will highlight a range of features. Use Ctrl->Click to toggle whether a feature is selected or not. 
 
-## Fuzzy Search
+**Results -> Layers** - Clicking on this button will export all the found results into new virtual layer. It is advised to install the ***Memory Saver Plugin*** to prevent these layers from disappearing after closing the project.
+
+**Search** - Clicking on this button will begin the search. In the case of a large data set, clicking on **Abort** will halt the process. The search will stop after finding 2000 matches.
+
+Note that the search is very quick when selecting a single vector layer under **Search Layers** and a single field under **Search Fields**. If this is not the case, regular expression searches are used and are slow. In the future this may change.
+
+## Fuzzy search
 
 This QGIS plugin makes use of two fuzzy search algorithms. One is based off of the ***Levenshtein*** algorithm and the other is a ***Soundex*** algorithm. The soundex is really only useful for matching single words that sound the same. This is a screen shot.
 
