@@ -28,9 +28,9 @@ class SearchLayers:
             'i18n',
             'searchLayers_{}.qm'.format(locale))
         if os.path.exists(locale_path):
-            translator = QTranslator()
-            translator.load(locale_path)
-            QCoreApplication.installTranslator(translator)
+            self.translator = QTranslator()
+            self.translator.load(locale_path)
+            QCoreApplication.installTranslator(self.translator)
 
     def initGui(self):
         # Create the menu items in the Plugin menu and attach the icon to the toolbar
