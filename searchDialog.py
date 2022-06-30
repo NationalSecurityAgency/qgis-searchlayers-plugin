@@ -52,11 +52,12 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.time_start = 0
         self.last_search_str = ''
         self.last_search_str2 = ''
+        self.layers_need_updating = True
 
     def closeDialog(self):
         '''Close the dialog box when the Close button is pushed'''
         self.hide()
-    
+
     def eventFilter(self, source, e):
         if e.type() == QEvent.MouseButtonPress:
             self.button_pressed = e.button()
@@ -70,6 +71,9 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         if self.isVisible() or len(self.results) != 0:
             self.populateLayerListComboBox()
             self.clearResults()
+            self.layers_need_updating = False
+        else:
+            self.layers_need_updating = True
 
     def select_feature(self):
         '''A feature has been selected from the list so we need to select
@@ -124,7 +128,8 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
     def showEvent(self, event):
         '''The dialog is being shown. We need to initialize it.'''
         super(LayerSearchDialog, self).showEvent(event)
-        self.populateLayerListComboBox()
+        if self.layers_need_updating:
+            self.populateLayerListComboBox()
 
     def populateLayerListComboBox(self):
         '''Find all the vector layers and add them to the layer list
@@ -142,6 +147,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.layerListComboBox.clear()
         self.layerListComboBox.addItems(layerlist)
         self.initFieldList()
+        self.layers_need_updating = False
 
     def initFieldList(self):
         selectedLayer = self.layerListComboBox.currentIndex()
@@ -190,7 +196,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.first_match_only = self.firstMatchCheckBox.isChecked()
         self.search_selected = self.searchSelectedCheckBox.isChecked()
         constrain_to_canvas = self.cannvasConstraintCheckBox.isChecked()
-        
+
         if selectedLayer == 0:
             # Include all vector layers
             layers = QgsProject.instance().mapLayers().values()
@@ -215,7 +221,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         if len(self.vlayers) == 0:
             self.showErrorMessage('There are no vector layers to search')
             return
-        
+
         # vlayers contains the layers that we will search in
         self.setButtons(True)
         self.resultsLabel.setText('')
@@ -224,7 +230,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
             selectedField = self.searchFieldComboBox.currentText()
         else:
             selectedField = None
-        
+
         # Because this could take a lot of time, set up a separate thread
         # for a worker function to do the searching.
         self.time_start = time.perf_counter()
@@ -239,7 +245,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
             self.two_string_match_single = self.twoStringMatchCheckBox.isChecked()
             not_search = self.notCheckBox.isChecked()
             not_search2 = self.not2CheckBox.isChecked()
-            
+
             try:
                 sstr = self.findStringEdit.text()
                 self.last_search_str = sstr
@@ -249,7 +255,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
                 self.showErrorMessage(tr('Invalid Search String'))
                 self.setButtons(False)
                 return
-                
+
             if sstr == '':
                 self.showErrorMessage(tr('Search string is empty'))
                 self.setButtons(False)
@@ -300,18 +306,18 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
 
         self.vlayers = []
         self.setButtons(False)
-    
+
     def workerError(self, exception_string):
         '''An error occurred so display it.'''
         # self.showErrorMessage(exception_string)
         print(exception_string)
-    
+
     def killWorker(self):
         '''This is initiated when the user presses the Stop button
         and will stop the search process'''
         if self.worker is not None:
             self.worker.kill()
-        
+
     def clearResults(self):
         '''Clear all the search results.'''
         if self.ignore_clear:
@@ -323,7 +329,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.resultsTable.setRowCount(0)        
         self.noSelection = False
         self.results2LayersButton.setEnabled(False)
-    
+
     def addFoundItem(self, layer, feature, attrname1, results1, attrname2, results2):
         '''We found an item so add it to the found list.'''
         # Don't allow sorting while adding new results
@@ -348,7 +354,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.found += 1   
         # Restore sorting
         self.resultsTable.setSortingEnabled(True)
-    
+
     def exportResults(self):
         # No found results, no export
         if len(self.results) == 0:
@@ -359,7 +365,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         for layer, feature in self.results:
             # print('{} {}'.format(layer, feature))
             layer_map[layer].dataProvider().addFeatures([feature])
-            
+
         dt = datetime.datetime.now()
         dt_name = dt.strftime('%Y-%m-%d %H:%M:%S')
         if len(self.last_search_str) > 20:
@@ -384,7 +390,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
             group.addLayer(new_layer)
         self.ignore_clear = False
         self.resultsTable.setDisabled(False)
-    
+
     def createExportedLayers(self):
         layer_mapping = {}
         for layer in self.layer_set:
@@ -398,7 +404,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
             new_layer.updateFields()
             layer_mapping[layer] = new_layer
         return(layer_mapping)
-                
+
     def showErrorMessage(self, message):
         '''Display an error message.'''
         self.iface.messageBar().pushMessage("", message, level=Qgis.Warning, duration=2)

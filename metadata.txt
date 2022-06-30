@@ -2,7 +2,7 @@
 name=Search Layers
 qgisMinimumVersion=3.0
 description=Enhanced textual searching on all QGIS layers and fields.
-version=3.0.8
+version=3.0.9
 author=C Hamilton
 email=adenaculture@gmail.com
 about=The Search Layers plugin features enhanced textual vector layer searching in QGIS. This plugin can search across all layers and all fields.
@@ -15,6 +15,7 @@ icon=icon.png
 experimental=False
 deprecated=False
 changelog=
+    3.0.9 - Keep menu settings when tool is closed.
     3.0.8 - Internationalize
     3.0.7 - Fix typo.
     3.0.6 - Add <Visible layers> search option and constraints for the canvas extent.
