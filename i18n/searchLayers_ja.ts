@@ -208,7 +208,7 @@
     <message>
         <location filename="../searchlayers.ui" line="413"/>
         <source>Zoom to selected features</source>
-        <translation>選択された機能への拡大表示</translation>
+        <translation>選択された地物への拡大表示</translation>
     </message>
     <message>
         <location filename="../searchlayers.ui" line="418"/>
