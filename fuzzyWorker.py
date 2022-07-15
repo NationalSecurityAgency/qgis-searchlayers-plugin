@@ -75,9 +75,9 @@ class FuzzyWorker(QObject):
         # Check for contraints
         if self.constrain_to_canvas and layer.isSpatial():
             extent = self.canvasExtent(layer)
-            request = QgsFeatureRequest(extent).setFlags(QgsFeatureRequest.NoGeometry)
+            request = QgsFeatureRequest(extent)
         else:
-            request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
+            request = QgsFeatureRequest()
         fnames = []
         # Get and Keep a copy of the field names
         for field in layer.fields():
@@ -149,9 +149,9 @@ class FuzzyWorker(QObject):
         search_str_len = len(self.searchStr)
         if self.constrain_to_canvas and layer.isSpatial():
             extent = self.canvasExtent(layer)
-            request = QgsFeatureRequest(extent).setFlags(QgsFeatureRequest.NoGeometry)
+            request = QgsFeatureRequest(extent)
         else:
-            request = QgsFeatureRequest().setFlags(QgsFeatureRequest.NoGeometry)
+            request = QgsFeatureRequest()
         # self.error.emit('searchFieldInLayer')
         request.setSubsetOfAttributes([selectedField], layer.fields())
         if self.search_selected:
