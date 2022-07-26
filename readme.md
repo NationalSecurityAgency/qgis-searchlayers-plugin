@@ -2,7 +2,7 @@
 
 The Search Layers plugin features enhanced textual vector layer searching in QGIS. It provides the ability to search across all layers and all fields. It also features a Fuzzy Search algorithm.
 
-Search Layers is located in the QGIS Plugins menu under *"Plugins->Search Layers->Search Layers"* or by selecting the tool bar icon. ![Toolbar Icon](icon.png)
+Search Layers is located in the QGIS Plugins menu under *"Plugins->Search Layers->Search Layers"* or by selecting the tool bar icon. <img src="icon.png" width="24" height="24">
 
 The following dialog box is displayed when "Search Layers" is first launched.
 
