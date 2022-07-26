@@ -42,7 +42,7 @@ class SearchLayers:
         self.iface.addPluginToMenu(tr("Search Layers"), self.searchAction)
 
         # Help
-        icon = QIcon(os.path.dirname(__file__) + '/help.png')
+        icon = QIcon(os.path.dirname(__file__) + '/help.svg')
         self.helpAction = QAction(icon, tr("Help"), self.iface.mainWindow())
         self.helpAction.setObjectName('searchLayersHelp')
         self.helpAction.triggered.connect(self.help)
