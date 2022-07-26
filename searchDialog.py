@@ -135,7 +135,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         '''Find all the vector layers and add them to the layer list
         that the user can select. In addition the user can search on all
         layers or all selected layers.'''
-        layerlist = ['<All Layers>','<Selected Layers>','<Visible Layers>']
+        layerlist = [tr('<All Layers>'),tr('<Selected Layers>'),tr('<Visible Layers>')]
         self.searchLayers = [None, None, None] # This is same size as layerlist
         layers = QgsProject.instance().mapLayers().values()
 
@@ -152,7 +152,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
     def initFieldList(self):
         selectedLayer = self.layerListComboBox.currentIndex()
         self.searchFieldComboBox.clear()
-        self.searchFieldComboBox.addItem('<All Fields>')
+        self.searchFieldComboBox.addItem(tr('<All Fields>'))
         if selectedLayer > 2:
             self.searchFieldComboBox.setEnabled(True)
             for field in self.searchLayers[selectedLayer].fields():
@@ -219,7 +219,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
             if isinstance(layer, QgsVectorLayer) and not layer.sourceName().startswith('__'):
                 self.vlayers.append(layer)
         if len(self.vlayers) == 0:
-            self.showErrorMessage('There are no vector layers to search')
+            self.showErrorMessage(tr('There are no vector layers to search'))
             return
 
         # vlayers contains the layers that we will search in

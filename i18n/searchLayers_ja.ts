@@ -13,7 +13,7 @@
         <translation>ヘルプ</translation>
     </message>
     <message>
-        <location filename="../searchDialog.py" line="40"/>
+        <location filename="../searchDialog.py" line="155"/>
         <source>&lt;All Fields&gt;</source>
         <translation>&lt;すべての列（フィールド）&gt;</translation>
     </message>
@@ -71,6 +71,26 @@
         <location filename="../searchDialog.py" line="260"/>
         <source>Search string is empty</source>
         <translation>検索文字列が空です</translation>
+    </message>
+    <message>
+        <location filename="../searchDialog.py" line="138"/>
+        <source>&lt;All Layers&gt;</source>
+        <translation>&lt;全レイヤ&gt;</translation>
+    </message>
+    <message>
+        <location filename="../searchDialog.py" line="138"/>
+        <source>&lt;Selected Layers&gt;</source>
+        <translation>&lt;選択レイヤ&gt;</translation>
+    </message>
+    <message>
+        <location filename="../searchDialog.py" line="138"/>
+        <source>&lt;Visible Layers&gt;</source>
+        <translation>&lt;表示レイヤ&gt;</translation>
+    </message>
+    <message>
+        <location filename="../searchDialog.py" line="222"/>
+        <source>There are no vector layers to search</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
