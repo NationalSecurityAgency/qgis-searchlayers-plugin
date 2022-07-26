@@ -7,7 +7,7 @@ from qgis.PyQt.uic import loadUiType
 from qgis.PyQt.QtWidgets import QDialog, QAbstractItemView, QTableWidget, QTableWidgetItem
 from qgis.PyQt.QtCore import Qt, QThread, QEvent, QCoreApplication
 
-from qgis.core import QgsVectorLayer, Qgis, QgsProject, QgsWkbTypes, QgsMapLayer, QgsFields
+from qgis.core import QgsVectorLayer, Qgis, QgsProject, QgsWkbTypes, QgsMapLayer, QgsFields, QgsExpressionContextUtils
 from .searchWorker import Worker
 from .fuzzyWorker import FuzzyWorker
 
@@ -139,10 +139,12 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.searchLayers = [None, None, None] # This is same size as layerlist
         layers = QgsProject.instance().mapLayers().values()
 
+        ProjectInstance = QgsProject.instance()
         for layer in layers:
             if layer.type() == QgsMapLayer.VectorLayer and not layer.sourceName().startswith('__'):
-                layerlist.append(layer.name())
-                self.searchLayers.append(layer)
+                if layer.name() == QgsExpressionContextUtils.projectScope(ProjectInstance).variable('searchlayers-plugin'):
+                    layerlist.append(layer.name())
+                    self.searchLayers.append(layer)
 
         self.layerListComboBox.clear()
         self.layerListComboBox.addItems(layerlist)
