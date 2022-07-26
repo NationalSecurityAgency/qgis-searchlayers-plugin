@@ -136,7 +136,7 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         '''Find all the vector layers and add them to the layer list
         that the user can select. In addition the user can search on all
         layers or all selected layers.'''
-        layerlist = ['<All Layers>','<Selected Layers>','<Visible Layers>']
+        layerlist = [tr('<All Layers>'),tr('<Selected Layers>'),tr('<Visible Layers>')]
         self.searchLayers = [None, None, None] # This is same size as layerlist
         layers = QgsProject.instance().mapLayers().values()
 

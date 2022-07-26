@@ -1,8 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="ja_JP" sourcelanguage="en">
+<!DOCTYPE TS>
+<TS version="2.1" language="ja_JP" sourcelanguage="en">
 <context>
-    <name>@default</name>
+    <name></name>
     <message>
+        <location filename="../searchDialog.py" line="41"/>
+        <source>&lt;All Fields&gt;</source>
+        <translation>&lt;すべての列（フィールド）&gt;</translation>
+    </message>
+    <message>
+        <location filename="../searchDialog.py" line="46"/>
+        <location filename="../searchDialog.py" line="181"/>
+        <location filename="../searchDialog.py" line="184"/>
+        <source>Layer</source>
+        <translation>レイヤ</translation>
+    </message>
+    <message>
+        <location filename="../searchDialog.py" line="46"/>
+        <location filename="../searchDialog.py" line="181"/>
+        <location filename="../searchDialog.py" line="184"/>
+        <source>Feature ID</source>
+        <translation>地物ID</translation>
+    </message>
+    <message>
+        <location filename="../searchDialog.py" line="46"/>
+        <location filename="../searchDialog.py" line="181"/>
+        <source>Field</source>
+        <translation>列（フィールド）</translation>
+    </message>
+    <message>
+        <location filename="../searchDialog.py" line="46"/>
+        <source>Search Results</source>
+        <translation>検索結果</translation>
+    </message>
+    <message>
+        <location filename="../searchDialog.py" line="139"/>
+        <source>&lt;All Layers&gt;</source>
+        <translation>&lt;全レイヤ&gt;</translation>
+    </message>
+    <message>
+        <location filename="../searchDialog.py" line="139"/>
+        <source>&lt;Selected Layers&gt;</source>
+        <translation>&lt;選択レイヤ&gt;</translation>
+    </message>
+    <message>
+        <location filename="../searchDialog.py" line="140"/>
+        <source>&lt;Visible Layers&gt;</source>
+        <translation>&lt;表示レイヤ&gt;</translation>
+    </message>
+    <message>
+        <location filename="../searchDialog.py" line="181"/>
+        <location filename="../searchDialog.py" line="318"/>
+        <source>Results</source>
+        <translation>結果</translation>
+    </message>
+    <message>
+        <location filename="../searchDialog.py" line="184"/>
+        <source>Field 1</source>
+        <translation>列（フィールド）1</translation>
+    </message>
+    <message>
+        <location filename="../searchDialog.py" line="184"/>
+        <source>Results 1</source>
+        <translation>結果1</translation>
+    </message>
+    <message>
+        <location filename="../searchDialog.py" line="184"/>
+        <source>Field 2</source>
+        <translation>列（フィールド）2</translation>
+    </message>
+    <message>
+        <location filename="../searchDialog.py" line="184"/>
+        <source>Results 2</source>
+        <translation>結果2</translation>
+    </message>
+    <message>
+        <location filename="../searchDialog.py" line="268"/>
+        <source>Invalid Search String</source>
+        <translation>無効な検索文字列</translation>
+    </message>
+    <message>
+        <location filename="../searchDialog.py" line="273"/>
+        <source>Search string is empty</source>
+        <translation>検索文字列が空です</translation>
+    </message>
+    <message>
+        <location filename="../searchLayers.py" line="38"/>
+        <location filename="../searchLayers.py" line="42"/>
+        <location filename="../searchLayers.py" line="49"/>
+        <location filename="../searchLayers.py" line="52"/>
         <location filename="../searchLayers.py" line="53"/>
         <source>Search Layers</source>
         <translation>検索レイヤ</translation>
@@ -12,70 +98,70 @@
         <source>Help</source>
         <translation>ヘルプ</translation>
     </message>
+</context>
+<context>
+    <name>@default</name>
     <message>
-        <location filename="../searchDialog.py" line="40"/>
+        <source>Search Layers</source>
+        <translation type="vanished">検索レイヤ</translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation type="vanished">ヘルプ</translation>
+    </message>
+    <message>
         <source>&lt;All Fields&gt;</source>
-        <translation>&lt;すべての列（フィールド）&gt;</translation>
+        <translation type="vanished">&lt;すべての列（フィールド）&gt;</translation>
     </message>
     <message>
-        <location filename="../searchDialog.py" line="171"/>
         <source>Layer</source>
-        <translation>レイヤ</translation>
+        <translation type="vanished">レイヤ</translation>
     </message>
     <message>
-        <location filename="../searchDialog.py" line="171"/>
         <source>Feature ID</source>
-        <translation>地物ID</translation>
+        <translation type="vanished">地物ID</translation>
     </message>
     <message>
-        <location filename="../searchDialog.py" line="45"/>
         <source>Search Results</source>
-        <translation>検索結果</translation>
+        <translation type="vanished">検索結果</translation>
     </message>
     <message>
-        <location filename="../searchDialog.py" line="168"/>
         <source>Field</source>
-        <translation>列（フィールド）</translation>
+        <translation type="vanished">列（フィールド）</translation>
     </message>
     <message>
-        <location filename="../searchDialog.py" line="305"/>
         <source>Results</source>
-        <translation>結果</translation>
+        <translation type="vanished">結果</translation>
     </message>
     <message>
-        <location filename="../searchDialog.py" line="171"/>
         <source>Field 1</source>
-        <translation>列（フィールド）1</translation>
+        <translation type="vanished">列（フィールド）1</translation>
     </message>
     <message>
-        <location filename="../searchDialog.py" line="171"/>
         <source>Results 1</source>
-        <translation>結果1</translation>
+        <translation type="vanished">結果1</translation>
     </message>
     <message>
-        <location filename="../searchDialog.py" line="171"/>
         <source>Field 2</source>
-        <translation>列（フィールド）2</translation>
+        <translation type="vanished">列（フィールド）2</translation>
     </message>
     <message>
-        <location filename="../searchDialog.py" line="171"/>
         <source>Results 2</source>
-        <translation>結果2</translation>
+        <translation type="vanished">結果2</translation>
     </message>
     <message>
-        <location filename="../searchDialog.py" line="255"/>
         <source>Invalid Search String</source>
-        <translation>無効な検索文字列</translation>
+        <translation type="vanished">無効な検索文字列</translation>
     </message>
     <message>
-        <location filename="../searchDialog.py" line="260"/>
         <source>Search string is empty</source>
-        <translation>検索文字列が空です</translation>
+        <translation type="vanished">検索文字列が空です</translation>
     </message>
 </context>
 <context>
     <name>LayerSearchDialog</name>
     <message>
+        <location filename="../searchlayers.ui" line="14"/>
         <location filename="../searchlayers.ui" line="348"/>
         <source>Search Layers</source>
         <translation>検索レイヤ</translation>
@@ -91,26 +177,32 @@
         <translation>ではない</translation>
     </message>
     <message>
+        <location filename="../searchlayers.ui" line="50"/>
         <location filename="../searchlayers.ui" line="146"/>
         <source>equals</source>
         <translation>等しい</translation>
     </message>
     <message>
+        <location filename="../searchlayers.ui" line="55"/>
         <location filename="../searchlayers.ui" line="151"/>
         <source>contains</source>
         <translation>含む</translation>
     </message>
     <message>
+        <location filename="../searchlayers.ui" line="60"/>
         <location filename="../searchlayers.ui" line="156"/>
         <source>begins with</source>
         <translation>から始まる</translation>
     </message>
     <message>
+        <location filename="../searchlayers.ui" line="65"/>
         <location filename="../searchlayers.ui" line="161"/>
         <source>ends with</source>
         <translation>で終わる</translation>
     </message>
     <message>
+        <location filename="../searchlayers.ui" line="73"/>
+        <location filename="../searchlayers.ui" line="169"/>
         <location filename="../searchlayers.ui" line="232"/>
         <source>Case sensitive</source>
         <translation>大文字・小文字を区別する</translation>
