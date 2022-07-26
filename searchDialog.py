@@ -1,3 +1,4 @@
+from multiprocessing.sharedctypes import Value
 import os
 import re
 import time
@@ -139,10 +140,20 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.searchLayers = [None, None, None] # This is same size as layerlist
         layers = QgsProject.instance().mapLayers().values()
 
+        '''If the project variable "searchlayers-plugin" is present, only the specified layer is covered.
+        Multiple layers are separated by ",".'''
         ProjectInstance = QgsProject.instance()
-        for layer in layers:
-            if layer.type() == QgsMapLayer.VectorLayer and not layer.sourceName().startswith('__'):
-                if layer.name() == QgsExpressionContextUtils.projectScope(ProjectInstance).variable('searchlayers-plugin'):
+        if QgsExpressionContextUtils.projectScope(ProjectInstance).variable('searchlayers-plugin'):
+            ProjectVariable = QgsExpressionContextUtils.projectScope(ProjectInstance).variable('searchlayers-plugin').split(',')
+            for i,j in enumerate(ProjectVariable):
+                for layer in layers:
+                    if layer.type() == QgsMapLayer.VectorLayer and not layer.sourceName().startswith('__'):
+                        if layer.name() == j:
+                            layerlist.append(layer.name())
+                            self.searchLayers.append(layer)    
+        else:
+            for layer in layers:
+                if layer.type() == QgsMapLayer.VectorLayer and not layer.sourceName().startswith('__'):
                     layerlist.append(layer.name())
                     self.searchLayers.append(layer)
 
