@@ -7,7 +7,7 @@ from qgis.PyQt.uic import loadUiType
 from qgis.PyQt.QtWidgets import QDialog, QAbstractItemView, QTableWidget, QTableWidgetItem
 from qgis.PyQt.QtCore import Qt, QThread, QEvent, QCoreApplication
 
-from qgis.core import QgsVectorLayer, Qgis, QgsProject, QgsWkbTypes, QgsMapLayer, QgsFields
+from qgis.core import QgsVectorLayer, Qgis, QgsProject, QgsWkbTypes, QgsMapLayer, QgsFields, QgsExpressionContextUtils
 from .searchWorker import Worker
 from .fuzzyWorker import FuzzyWorker
 
@@ -138,11 +138,23 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         layerlist = [tr('<All Layers>'),tr('<Selected Layers>'),tr('<Visible Layers>')]
         self.searchLayers = [None, None, None] # This is same size as layerlist
         layers = QgsProject.instance().mapLayers().values()
-
-        for layer in layers:
-            if layer.type() == QgsMapLayer.VectorLayer and not layer.sourceName().startswith('__'):
-                layerlist.append(layer.name())
-                self.searchLayers.append(layer)
+        
+        '''If the project variable "searchlayers-plugin" is present, only the specified layer is covered.
+        Multiple layers are separated by ",".'''
+        ProjectInstance = QgsProject.instance()
+        if QgsExpressionContextUtils.projectScope(ProjectInstance).variable('searchlayers-plugin'):
+            ProjectVariable = QgsExpressionContextUtils.projectScope(ProjectInstance).variable('searchlayers-plugin').split(',')
+            for i,j in enumerate(ProjectVariable):
+                for layer in layers:
+                    if layer.type() == QgsMapLayer.VectorLayer and not layer.sourceName().startswith('__'):
+                        if layer.name() == j:
+                            layerlist.append(layer.name())
+                            self.searchLayers.append(layer)
+        else:
+            for layer in layers:
+                if layer.type() == QgsMapLayer.VectorLayer and not layer.sourceName().startswith('__'):
+                    layerlist.append(layer.name())
+                    self.searchLayers.append(layer)
 
         self.layerListComboBox.clear()
         self.layerListComboBox.addItems(layerlist)
