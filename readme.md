@@ -31,7 +31,10 @@ Under each search string text box a drop down menu specifies how the search stri
 * *&lt;All Layers&gt;* - All vector layers will be searched whether they are visible or not.
 * *&lt;Selected layers&gt;* - All the selected layers in the Layers panel will be searched wither they are visible or not.
 * *&lt;Visible layers&gt;* - All visible layers will be searched.
-* *A specific layer* - Any of the vector layers in the QGIS project can be selected. When one is selected, then **Search Fields** will be enabled and by default *&lt;All Fields&gt;* will be displayed, but any field can be chosen from the layer and the search will only search on that layer and field.
+* *A specific layer* - Any of the vector layers in the QGIS project can be selected. When one is selected, then **Search Fields** will be enabled and by default *&lt;All Fields&gt;* will be displayed, but any field can be chosen from the layer and the search will only search on that layer and field.  
+ You can also specify any layer in **the project variable 'searchlayers-plugin'** to display only the specified layer.
+The way to specify it is to use 'layer-name,layer-name,... '. Layer names that do not exist will be ignored.　　
+![Specify by variable](https://user-images.githubusercontent.com/86514652/185699776-c2f3f00e-54fb-47d5-b6e1-9a80bae8bc97.png)
 
 **Constrain search to canvas extent** - Checking this box will constrain the search to look for features that are within the current canvas window view. If you are only interested in the features in the canvas view, this will greatly speed up the search.
 
