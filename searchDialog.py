@@ -4,7 +4,7 @@ import time
 import datetime
 
 from qgis.PyQt.uic import loadUiType
-from qgis.PyQt.QtWidgets import QDialog, QAbstractItemView, QTableWidget, QTableWidgetItem
+from qgis.PyQt.QtWidgets import QDialog, QAbstractItemView, QTableWidget, QTableWidgetItem,  QMenu, QAction
 from qgis.PyQt.QtCore import Qt, QThread, QEvent, QCoreApplication
 
 from qgis.core import QgsVectorLayer, Qgis, QgsProject, QgsWkbTypes, QgsMapLayer, QgsFields, QgsExpressionContextUtils
@@ -18,6 +18,24 @@ def tr(string):
 FORM_CLASS, _ = loadUiType(os.path.join(
     os.path.dirname(__file__), 'searchlayers.ui'))
 
+
+class OpenRecordAction(QAction):
+    def __init__(self, iface=None, parent=None, results=[]):
+        super().__init__("Open Record Form", parent)
+        self.iface = iface
+        self.results = results
+        self.triggered.connect(self.open_record)
+
+    def open_record(self):
+
+        selectedItems = self.parentWidget().selectedItems()
+        # print(len(selectedItems))
+        selectedRow = selectedItems[0].row()
+        foundid = self.parentWidget().item(selectedRow, 0).data(Qt.UserRole)
+        selectedLayer = self.results[foundid][0]
+        selectedFeature = self.results[foundid][1]
+        self.iface.openFeatureForm(selectedLayer, selectedFeature, True)
+        self.iface.setActiveLayer(selectedLayer)
 
 class LayerSearchDialog(QDialog, FORM_CLASS):
     button_pressed = 1
@@ -45,6 +63,9 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.resultsTable.setHorizontalHeaderLabels([tr('Layer'),tr('Feature ID'),tr('Field'),tr('Search Results')])
         self.resultsTable.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.resultsTable.itemSelectionChanged.connect(self.select_feature)
+        self.resultsTable.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.resultsTable.customContextMenuRequested.connect(self.show_context_menu)
+
         # self.resultsTable.viewport().installEventFilter(self)
         self.results = []
         self.ignore_clear = False
@@ -53,6 +74,20 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.last_search_str = ''
         self.last_search_str2 = ''
         self.layers_need_updating = True
+
+    def show_context_menu(self, pos):
+
+        context_menu = QMenu(self.resultsTable)
+
+        context_menu.addAction(
+            OpenRecordAction(
+                iface=self.iface,
+                parent=self.resultsTable,
+                results=self.results
+            )
+        )
+
+        context_menu.exec_(self.resultsTable.mapToGlobal(pos))
 
     def closeDialog(self):
         '''Close the dialog box when the Close button is pushed'''
@@ -420,3 +455,4 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
     def showErrorMessage(self, message):
         '''Display an error message.'''
         self.iface.messageBar().pushMessage("", message, level=Qgis.Warning, duration=2)
+
