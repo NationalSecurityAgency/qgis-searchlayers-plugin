@@ -59,6 +59,18 @@ The selected feature(s) will be highlighted unless **Only search selected featur
 
 Note that the search is very quick when selecting a single vector layer under **Search Layers** and a single field under **Search Fields**. If this is not the case, regular expression searches are used and are slow. In the future this may change.
 
+## Open the search results feature's attribute form
+
+If you right-mouse click on a search results entry, a context menu titled **Open Record Form** will be displayed.
+
+![Search Layers Dialog](doc/layersearch4.jpg)
+
+Clicking on **Open Record Form** will display the feature's attributes. If the layer is in edit mode, then you can modify the feature's attributes and save them. If it is not in edit mode, you will be able to view them but not edit them.
+
+![Search Layers Dialog](doc/featureform.jpg)
+
+
+
 ## Fuzzy search
 
 This QGIS plugin makes use of two fuzzy search algorithms. One is based off of the ***Levenshtein*** algorithm and the other is a ***Soundex*** algorithm. The soundex is really only useful for matching single words that sound the same. This is a screen shot.
