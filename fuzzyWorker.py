@@ -153,7 +153,7 @@ class FuzzyWorker(QObject):
         else:
             request = QgsFeatureRequest()
         # self.error.emit('searchFieldInLayer')
-        request.setSubsetOfAttributes([selectedField], layer.fields())
+        # request.setSubsetOfAttributes([selectedField], layer.fields())
         if self.search_selected:
             iter = layer.getSelectedFeatures(request)
         else:

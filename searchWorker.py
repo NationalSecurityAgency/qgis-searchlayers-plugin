@@ -278,7 +278,7 @@ class Worker(QObject):
             request = QgsFeatureRequest(extent)
         else:
             request = QgsFeatureRequest()
-        request.setSubsetOfAttributes([selectedField], layer.fields())
+        # request.setSubsetOfAttributes([selectedField], layer.fields())
         request.setFilterExpression(fstring)
         if self.search_selected:
             iter = layer.getSelectedFeatures(request)
