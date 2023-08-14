@@ -57,10 +57,13 @@ code {
 <p><strong>Search Layers</strong> specifies what layers will be in the search.</p>
 <ul>
 <li><em>&lt;All Layers&gt;</em> - All vector layers will be searched whether they are visible or not.</li>
-<li><em>&lt;Selected layers&gt;</em> - All the selected layers in the Layers panel will be searched wither they are visible or not.</li>
+<li><em>&lt;Selected layers&gt;</em> - All the selected layers in the Layers panel will be searched whether they are visible or not.</li>
 <li><em>&lt;Visible layers&gt;</em> - All visible layers will be searched.</li>
 <li><em>A specific layer</em> - Any of the vector layers in the QGIS project can be selected. When one is selected, then <strong>Search Fields</strong> will be enabled and by default <em>&lt;All Fields&gt;</em> will be displayed, but any field can be chosen from the layer and the search will only search on that layer and field.</li>
 </ul>
+<p>You can also specify any layer using the project variable <strong>searchlayers-plugin</strong> to display only the specified layer(s). The <strong><em>Value</em></strong> of the variable is specified as 'layer-name,layer-name,... '. Layer names that do not exist will be ignored.</p>
+<p><img alt="Specify by variable" src="doc/variable.png" /></p>
+<p>You can add the project variable by selecting <strong><em>Settings-&gt;Options...</em></strong> from the QGIS menu and then selecting the <strong><em>Variables</em></strong> tab on the left. You click on the bottom right green plus sign to add a new variable. Type in <strong>searchlayers-plugin</strong> in the first column and then the comma separated layer list in the second column.</p>
 <p><strong>Constrain search to canvas extent</strong> - Checking this box will constrain the search to look for features that are within the current canvas window view. If you are only interested in the features in the canvas view, this will greatly speed up the search.</p>
 <p><strong>Report one result per feature</strong> - It is possible that a search string could match the contents in one or more attribute fields. By checking this, only the first match per feature will be reported.</p>
 <p><strong>Only search selected features</strong> - When checked, the features that are selected in QGIS will be the only ones searched. This is one way to limit a search to a particular area. Note that with this checked, the normal interaction of clicking on a found feature in the list will not select the feature for obvious reasons; however, the zoom or pan to actions will still apply.</p>
@@ -74,6 +77,11 @@ code {
 <p><strong>Results -&gt; Layers</strong> - Clicking on this button will export all the found results into new virtual layer. It is advised to install the <strong><em>Memory Saver Plugin</em></strong> to prevent these layers from disappearing after closing the project.</p>
 <p><strong>Search</strong> - Clicking on this button will begin the search. In the case of a large data set, clicking on <strong>Abort</strong> will halt the process. The search will stop after finding 2000 matches.</p>
 <p>Note that the search is very quick when selecting a single vector layer under <strong>Search Layers</strong> and a single field under <strong>Search Fields</strong>. If this is not the case, regular expression searches are used and are slow. In the future this may change.</p>
+<h2>Open the search results feature's attribute form</h2>
+<p>If you right-mouse click on a search results entry, a context menu titled <strong>Open Record Form</strong> will be displayed.</p>
+<p><img alt="Search Layers Dialog" src="doc/layersearch4.jpg" /></p>
+<p>Clicking on <strong>Open Record Form</strong> will display the feature's attributes. If the layer is in edit mode, then you can modify the feature's attributes and save them. If it is not in edit mode, you will be able to view them but not edit them.</p>
+<p><img alt="Search Layers Dialog" src="doc/featureform.jpg" /></p>
 <h2>Fuzzy search</h2>
 <p>This QGIS plugin makes use of two fuzzy search algorithms. One is based off of the <strong><em>Levenshtein</em></strong> algorithm and the other is a <strong><em>Soundex</em></strong> algorithm. The soundex is really only useful for matching single words that sound the same. This is a screen shot.</p>
 <p><img alt="Search Layers Dialog" src="doc/layersearch3.jpg" /></p></body>
