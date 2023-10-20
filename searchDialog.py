@@ -200,13 +200,45 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         selectedLayer = self.layerListComboBox.currentIndex()
         self.searchFieldComboBox.clear()
         self.searchFieldComboBox.addItem(tr('<All Fields>'))
-        if selectedLayer > 2:
-            self.searchFieldComboBox.setEnabled(True)
-            for field in self.searchLayers[selectedLayer].fields():
-                self.searchFieldComboBox.addItem(field.name())
+
+        uniqueFieldNames = set()
+        layers = self.getSearchLayers(selectedLayer)
+
+        for layer in layers:
+            for field in layer.fields():
+                uniqueFieldNames.add(field.name())
+
+        # Add unique field names to combobox
+        self.searchFieldComboBox.setEnabled(True)
+        for fieldName in uniqueFieldNames:
+            self.searchFieldComboBox.addItem(fieldName)
+
+    def getSearchLayers(self, selectedLayer):
+        layers = []
+
+        if selectedLayer == 0:
+            # Include all vector layers
+            layers = QgsProject.instance().mapLayers().values()
+        elif selectedLayer == 1:
+            # Include all selected vector layers
+            layers = self.iface.layerTreeView().selectedLayers()
+        elif selectedLayer == 2:
+            # This is for visible layers and content
+            layer_trees = QgsProject.instance().layerTreeRoot().findLayers()
+            layers = []
+            for lt in layer_trees:
+                if lt.isVisible():
+                    layers.append(lt.layer())
         else:
-            self.searchFieldComboBox.setCurrentIndex(0)
-            self.searchFieldComboBox.setEnabled(False)
+            layers = [self.searchLayers[selectedLayer]]
+
+        # Return only the vector layers that are to be searched
+        return [
+            layer
+            for layer in layers
+            if isinstance(layer, QgsVectorLayer)
+            and not layer.sourceName().startswith("__")
+        ]
 
     def initSearchResultsTable(self):
         self.clearResults()
@@ -244,27 +276,8 @@ class LayerSearchDialog(QDialog, FORM_CLASS):
         self.search_selected = self.searchSelectedCheckBox.isChecked()
         constrain_to_canvas = self.cannvasConstraintCheckBox.isChecked()
 
-        if selectedLayer == 0:
-            # Include all vector layers
-            layers = QgsProject.instance().mapLayers().values()
-        elif selectedLayer == 1:
-            # Include all selected vector layers
-            layers = self.iface.layerTreeView().selectedLayers()
-        elif selectedLayer == 2:
-            # This is for visiable layers and content
-            layer_trees = QgsProject.instance().layerTreeRoot().findLayers()
-            layers = []
-            for lt in layer_trees:
-                if lt.isVisible():
-                    layers.append(lt.layer())
-        else:
-            # Only search on the selected vector layer
-            layers = [self.searchLayers[selectedLayer]]
-        self.vlayers=[]
-        # Find the vector layers that are to be searched
-        for layer in layers:
-            if isinstance(layer, QgsVectorLayer) and not layer.sourceName().startswith('__'):
-                self.vlayers.append(layer)
+        self.vlayers = self.getSearchLayers(selectedLayer)
+
         if len(self.vlayers) == 0:
             self.showErrorMessage(tr('There are no vector layers to search'))
             return
