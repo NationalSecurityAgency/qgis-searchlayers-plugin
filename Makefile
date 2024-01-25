@@ -1,7 +1,7 @@
 PLUGINNAME = searchlayers
 PLUGINS = "$(HOME)"/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/$(PLUGINNAME)
 PY_FILES = searchLayers.py __init__.py searchDialog.py searchWorker.py fuzzyWorker.py
-EXTRAS = icon.png help.svg metadata.txt
+EXTRAS = icon.png help.svg metadata.txt LICENSE
 UI_FILES = searchlayers.ui
 
 deploy: 
