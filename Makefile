@@ -9,6 +9,7 @@ deploy:
 	cp -vf $(PY_FILES) $(PLUGINS)
 	mkdir -p $(PLUGINS)/i18n
 	cp -vf i18n/searchLayers_ja.qm $(PLUGINS)/i18n
+	cp -vf i18n/searchLayers_hu.qm $(PLUGINS)/i18n
 	cp -vf $(UI_FILES) $(PLUGINS)
 	cp -vf $(EXTRAS) $(PLUGINS)
 	cp -vfr doc $(PLUGINS)
